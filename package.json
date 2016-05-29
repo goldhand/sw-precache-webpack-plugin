@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "make build",
-    "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md",
+    "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md"
   },
   "keywords": [
     "webpack",
