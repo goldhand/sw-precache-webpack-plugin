@@ -22,18 +22,11 @@ sftp-config.json
 # Logs
 *.log
 
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-htmlcov
-
 # npm
 node_modules/
 
 # Compass
 .sass-cache
 
-# Webpack
-# src/bundles/
-# src/dist/
+# Build
+lib/
