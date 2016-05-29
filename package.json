@@ -4,8 +4,8 @@
   "description": "Webpack plugin for using service workers",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "npm run build",
-    "build": "node_modules/.bin/babel src -d lib --presets es2015,stage-0"
+    "prepublish": "make build",
+    "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md",
   },
   "keywords": [
     "webpack",
