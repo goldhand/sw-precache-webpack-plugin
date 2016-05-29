@@ -1,0 +1,29 @@
+{
+  "name": "sw-precache-webpack-plugin",
+  "version": "0.1.0",
+  "description": "Webpack plugin for using service workers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "webpack",
+    "precache",
+    "sw-precache",
+    "plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goldhand/sw-precache-webpack-plugin.git"
+  },
+  "author": "Will Farley",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/goldhand/sw-precache-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/goldhand/sw-precache-webpack-plugin#readme",
+  "license": "ISC",
+  "dependencies": {
+    "sw-precache": "^3.2.0"
+  }
+}
