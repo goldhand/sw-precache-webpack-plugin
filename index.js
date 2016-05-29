@@ -1,16 +1,17 @@
 const
   path = require('path'),
   del = require('del'),
-  swPrecache = require('sw-precache'),
-  fs = require('fs'),
-  mkdirp = require('mkdirp');
+  swPrecache = require('sw-precache');
 
-var DEFAULT_CACHE_ID = 'sw-precache-plugin';
-var DEFAULT_WORKER_FILENAME = 'service-worker.js';
-var DEFAULT_OUTPUT_FILENAME = '[name]-[hash].js';
+
+const
+  DEFAULT_CACHE_ID = 'sw-precache-plugin',
+  DEFAULT_WORKER_FILENAME = 'service-worker.js',
+  DEFAULT_OUTPUT_FILENAME = '[name]-[hash].js';
 
 /**
  * @param {object} options - cacheId, filename, options
+ * @returns {undefined}
  */
 function SWPrecacheWebpackPlugin(options) {
   this.options = options || {};
@@ -46,7 +47,6 @@ SWPrecacheWebpackPlugin.prototype.apply = function(compiler) {
       config.replacePrefix = compiler.options.output.publicPath;
     }
     self.writeServiceWorker(compiler, config);
-    self.writeOutput(compiler, config);
   });
 };
 
@@ -59,16 +59,6 @@ SWPrecacheWebpackPlugin.prototype.writeServiceWorker = function(compiler, config
   return del(workerFilename).then(function() {
     return swPrecache.write(workerFilename, workerOptions);
   });
-};
-
-SWPrecacheWebpackPlugin.prototype.writeOutput = function(compiler, contents) {
-  var outputDir = '.';
-  var outputFilename = path.join(outputDir, 'sw-prefeth-config.json');
-  if (compiler.options.output.publicPath) {
-    contents.publicPath = compiler.options.output.publicPath;
-  }
-  mkdirp.sync(path.dirname(outputFilename));
-  fs.writeFileSync(outputFilename, JSON.stringify(contents, null, this.options.indent));
 };
 
 module.exports = SWPrecacheWebpackPlugin;

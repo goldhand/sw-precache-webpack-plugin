@@ -1,6 +1,6 @@
 sw-precache-webpack-plugin
 ==========================
-Webpack plugin for using service workers. Will generate a service worker file using `sw-precache` and add it to your build directory.
+Webpack plugin for using service workers. Will generate a [service worker][1] file using [sw-precache][2] and add it to your build directory.
 
 
 Install
@@ -54,3 +54,8 @@ Then you would just register it in your application:
   }
 })();
 ```
+
+
+<!--references-->
+[1]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
+[2]: https://github.com/GoogleChrome/sw-precache "SW-Precache"

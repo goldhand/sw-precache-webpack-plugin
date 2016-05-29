@@ -22,7 +22,6 @@
     "url": "https://github.com/goldhand/sw-precache-webpack-plugin/issues"
   },
   "homepage": "https://github.com/goldhand/sw-precache-webpack-plugin#readme",
-  "license": "ISC",
   "dependencies": {
     "sw-precache": "^3.2.0"
   }
