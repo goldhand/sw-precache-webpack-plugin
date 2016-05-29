@@ -32,6 +32,7 @@ SWPrecacheWebpackPlugin.prototype.apply = function(compiler) {
         return path.join(outputPath, f);
       }));
     }, []);
+    staticFileGlobs.push(path.join(outputPath, 'index.html'));
 
     const config = {
       cacheId: self.options.cacheId,
