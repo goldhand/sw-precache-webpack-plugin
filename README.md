@@ -13,7 +13,7 @@ Usage
 -----
 ```javascript
 var path = require('path');
-var SWPrecacheWebpackPlugin = require('./src/sw-precache-webpack-plugin')
+var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 
 
 module.exports = {
@@ -45,7 +45,9 @@ Then you would just register it in your application:
   if('serviceWorker' in navigator) {
     navigator.serviceWorker  
              .register('/my-service-worker.js')
-             .then(function() { console.log('Service worker registered'); })
+             .then(function() {
+               console.log('Service worker registered');
+             })
              .catch(function(error) {
                console.error('Error registering service worker: ', error);
              });
