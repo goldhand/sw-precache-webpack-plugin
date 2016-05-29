@@ -1,5 +1,8 @@
 sw-precache-webpack-plugin
 ==========================
+[![NPM](https://nodei.co/npm/sw-precache-webpack-plugin.png)](https://nodei.co/npm/sw-precache-webpack-plugin/)
+
+
 Webpack plugin for using service workers. Will generate a [service worker][1] file using [sw-precache][2] and add it to your build directory.
 
 
