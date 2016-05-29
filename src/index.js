@@ -1,7 +1,6 @@
-const
-  path = require('path'),
-  del = require('del'),
-  swPrecache = require('sw-precache');
+import path from 'path';
+import del from 'del';
+import swPrecache from 'sw-precache';
 
 
 const
@@ -9,56 +8,66 @@ const
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
   DEFAULT_OUTPUT_FILENAME = '[name]-[hash].js';
 
+const DEFAULT_OPTIONS = {
+  cacheId: DEFAULT_CACHE_ID,
+  filename: DEFAULT_WORKER_FILENAME,
+  outputFilename: DEFAULT_OUTPUT_FILENAME,
+};
+
 /**
  * @param {object} options - cacheId, filename, options
  * @returns {undefined}
  */
-function SWPrecacheWebpackPlugin(options) {
-  this.options = options || {};
-  this.options.cacheId = this.options.cacheId || DEFAULT_CACHE_ID;
-  this.options.filename = this.options.filename || DEFAULT_WORKER_FILENAME;
-  this.options.outputFilename = this.options.outputFilename || DEFAULT_OUTPUT_FILENAME;
-  this.options.options = this.options.options || {};
-}
+class SWPrecacheWebpackPlugin {
 
-SWPrecacheWebpackPlugin.prototype.apply = function(compiler) {
-  var self = this;
-
-  compiler.plugin('done', function(stats) {
-
-    const outputPath = self.options.path || compiler.options.output.path || '.';
-
-    var staticFileGlobs = stats.compilation.chunks.reduce(function(files, chunk) {
-      return files.concat(chunk.files.map(function(f) {
-        return path.join(outputPath, f);
-      }));
-    }, []);
-    staticFileGlobs.push(path.join(outputPath, 'index.html'));
-
-    const config = {
-      cacheId: self.options.cacheId,
-      verbose: true,
-      root: outputPath,
-      // staticFileGlobs: [outputPath + '/*'],
-      staticFileGlobs: staticFileGlobs,
-      stripPrefix: outputPath,
+  constructor(options) {
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
     };
-    if (compiler.options.output.publicPath) {
-      config.replacePrefix = compiler.options.output.publicPath;
-    }
-    self.writeServiceWorker(compiler, config);
-  });
-};
+  }
 
-SWPrecacheWebpackPlugin.prototype.writeServiceWorker = function(compiler, config) {
-  const
-    workerDir = compiler.options.output.path || '.',
-    workerFilename = path.join(workerDir, this.options.filename || DEFAULT_WORKER_FILENAME),
-    workerOptions = config;  // TODO: make this overridable with options.options
+  apply(compiler) {
 
-  return del(workerFilename).then(function() {
-    return swPrecache.write(workerFilename, workerOptions);
-  });
-};
+    compiler.plugin('done', (stats) => {
+
+      const outputPath = this.options.path || compiler.options.output.path || '.';
+
+      const staticFileGlobs = stats.compilation.chunks.reduce((files, chunk) => {
+        return files.concat(chunk.files.map((f) => {
+          return path.join(outputPath, f);
+        }));
+      }, []);
+      staticFileGlobs.push(path.join(outputPath, 'index.html'));
+
+      const config = {
+        // cacheId: this.options.cacheId,
+        root: outputPath,
+        // staticFileGlobs: [outputPath + '/*'],
+        staticFileGlobs: staticFileGlobs,
+        stripPrefix: outputPath,
+        verbose: true,
+      };
+      if (compiler.options.output.publicPath) {
+        config.replacePrefix = compiler.options.output.publicPath;
+      }
+      this.writeServiceWorker(compiler, config);
+    });
+  }
+
+  writeServiceWorker(compiler, config) {
+    const
+      workerDir = compiler.options.output.path || '.',
+      workerFilename = path.join(workerDir, this.options.filename),
+      workerOptions = {
+        ...config,
+        ...this.options.options,
+      };
+
+    return del(workerFilename).then(() => {
+      return swPrecache.write(workerFilename, workerOptions);
+    });
+  }
+}
 
 module.exports = SWPrecacheWebpackPlugin;
