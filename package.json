@@ -2,21 +2,32 @@
   "name": "sw-precache-webpack-plugin",
   "version": "0.1.1",
   "description": "Webpack plugin for using service workers",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublish": "npm run build",
+    "build": "babel src -d lib"
   },
   "keywords": [
     "webpack",
+    "plugin",
     "precache",
     "sw-precache",
-    "plugin"
+    "service",
+    "worker"
+  ],
+  "tags": [
+    "webpack",
+    "plugin",
+    "precache",
+    "sw-precache",
+    "service",
+    "worker"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/goldhand/sw-precache-webpack-plugin.git"
   },
-  "author": "Will Farley",
+  "author": "Will Farley <a.will.farley@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/goldhand/sw-precache-webpack-plugin/issues"
@@ -24,5 +35,11 @@
   "homepage": "https://github.com/goldhand/sw-precache-webpack-plugin#readme",
   "dependencies": {
     "sw-precache": "^3.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-preset-es2015-webpack": "^6.4.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "mocha": "^2.5.3"
   }
 }
