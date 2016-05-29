@@ -7,8 +7,7 @@
 
   "parser": "babel-eslint",
   "plugins": [
-    "babel",
-    "react"
+    "babel"
   ],
 
   "parserOptions": {
