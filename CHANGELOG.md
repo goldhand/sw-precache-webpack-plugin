@@ -1,3 +1,9 @@
+## 0.2.1
+
+* Add eslint babel
+* Update readme with options instructions and example
+* Make options object passable as single argument
+
 ## 0.2.0
 
 * Add changelog
