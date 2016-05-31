@@ -32,10 +32,17 @@ module.exports = {
   },
 
   plugins: [
-    new SWPrecacheWebpackPlugin({
-      cacheId: 'my-project-name',
-      filename: 'my-service-worker.js',
-    }),
+    new SWPrecacheWebpackPlugin(
+      {
+        cacheId: "my-project-name",
+        maximumFileSizeToCacheInBytes: 4194304,
+        runtimeCaching: [{
+          handler: "cacheFirst",
+          urlPattern: /[.]mp3$/,
+        }],
+        verbose: true,
+      }
+    ),
   ]
 }
 ```
@@ -47,7 +54,7 @@ Then you would just register it in your application:
 (function() {
   if('serviceWorker' in navigator) {
     navigator.serviceWorker  
-             .register('/my-service-worker.js')
+             .register('/service-worker.js')
              .then(function() {
                console.log('Service worker registered');
              })
@@ -58,7 +65,48 @@ Then you would just register it in your application:
 })();
 ```
 
+Options
+-------
+All options as specified by [sw-precache][3] are able to be passed in to the plugin.
+
+I recommend omitting the `staticFileGlobs` argument and letting the plugin automatically determine the files to cache based on your bundles being built. If you omit the `staticFileGlobs` argument will add `[name]` and `[hash]` of each bundle to `staticFileGlobs`.
+
+*  // sw-precache options:
+* @param {options: cacheId [String]},
+* @param {options: directoryIndex [String]},
+* @param {options: dynamicUrlToDependencies [Object<String,Array<String>]},
+* @param {options: handleFetch [boolean]},
+* @param {options: ignoreUrlParametersMatching [Array<Regex>]},
+* @param {options: importScripts [Array<String>]},
+* @param {options: logger [function]},
+* @param {options: maximumFileSizeToCacheInBytes [Number]},
+* @param {options: navigateFallbackWhitelist [Array<RegExp>]},
+* @param {options: replacePrefix [String]},
+* @param {options: runtimeCaching [Array<Object>]},
+* @param {options: staticFileGlobs [Array<String>]},
+* @param {options: stripPrefix [String}]
+* @param {options: templateFilePath [String]},
+* @param {options: verbose [boolean]},
+
+You can configure the plugin with these options (passible in the same options object as `sw-precache` options)
+*  // plugin options:
+*  @param {string} [{options: filename}] - Service worker filename, default is 'service-worker.js'
+*  @param {string} [{options: filepath}] - Service worker path and name, default is to use webpack.output.path + options.filename
+
+Example:
+```javascript
+plugins: [
+  new SWPrecacheWebpackPlugin(
+    {
+      filename: "my-project-service-worker.js",
+      cacheId: "my-project-name",
+    }
+  ),
+]
+```
+
 
 <!--references-->
 [1]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
 [2]: https://github.com/GoogleChrome/sw-precache "SW-Precache"
+[3]: https://github.com/GoogleChrome/sw-precache#options-parameter "SW-Precache Options"
