@@ -17,6 +17,6 @@ Start the server
 
 ---------------------------------
 
-The service worker is registered in the [`default.ejs` template](/examples/templates/default.ejs)
+The service worker is registered in the [`default.ejs` template](/examples/src/templates/default.ejs)
 
 The `SWPrecacheWebpackPlugin` is in the plugins of the [`webpack.config.js` file](/examples/webpack.config.js)
