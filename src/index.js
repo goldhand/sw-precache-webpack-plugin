@@ -66,11 +66,8 @@ class SWPrecacheWebpackPlugin {
       // What is the output path specified in webpack config
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
 
-      const staticFileGlobs = stats.compilation.chunks.reduce((files, chunk) => {
-        return files.concat(chunk.files.map((f) => {
-          return path.join(outputPath, f);
-        }));
-      }, []);
+      const staticFileGlobs = getAssetGlobs(stats.compilation).map(f => path.join(outputPath, f));
+
       staticFileGlobs.push(path.join(outputPath, 'index.html'));
 
       const config = {
@@ -102,5 +99,14 @@ class SWPrecacheWebpackPlugin {
     });
   }
 }
+
+function getAssetGlobs(compilation) {
+  const assets = [];
+  for (const asset in compilation.assets) {
+    assets.push(asset);
+  }
+  return assets;
+}
+
 
 module.exports = SWPrecacheWebpackPlugin;
