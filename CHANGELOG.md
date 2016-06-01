@@ -1,3 +1,8 @@
+## 0.2.3
+
+* Add example project
+* Use compilation assets instead of chunk.files
+
 ## 0.2.1
 
 * Add eslint babel
