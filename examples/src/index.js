@@ -9,7 +9,7 @@ import rootReducer from './reducers';
 
 
 const
-  STORE = createStore(),
+  STORE = createStore(rootReducer),
   ROOT_ELEMENT = 'main';
 
 
