@@ -1,0 +1,10 @@
+<% if (webpackConfig.entry) { %>
+<p>Webpack entry is: 
+<ul>
+<% for (var index in webpackConfig.entry) { %>
+  <li><%= webpackConfig.entry[index] %></li>
+<% } %>
+</ul>
+<% } else { %>
+  <p>No webpackConfig entry object</p>
+<% } %>

@@ -105,8 +105,13 @@ plugins: [
 ]
 ```
 
+Examples
+--------
+See the [examples documentation][4]
+
 
 <!--references-->
 [1]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
 [2]: https://github.com/GoogleChrome/sw-precache "SW-Precache"
 [3]: https://github.com/GoogleChrome/sw-precache#options-parameter "SW-Precache Options"
+[4]: /examples/README.md
