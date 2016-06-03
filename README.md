@@ -1,9 +1,10 @@
-sw-precache-webpack-plugin
+SW Precache Webpack Plugin
 ==========================
-[![NPM](https://nodei.co/npm/sw-precache-webpack-plugin.png)](https://nodei.co/npm/sw-precache-webpack-plugin/)
+[![NPM version][npm-img]][npm-url]
+[![Dependency Status][daviddm-img]][daviddm-url]
+[![devDependency Status][daviddmdev-img]][daviddmdev-url]
 
-
-Webpack plugin for using service workers. Will generate a [service worker][1] file using [sw-precache][2] and add it to your build directory.
+__`SWPrecacheWebpackPlugin`__ is a [webpack][webpack] plugin for using [service workers][sw-guide] to cache your external project dependencies. It will generate a service worker file using [sw-precache][sw-precache] and add it to your build directory.
 
 
 Install
@@ -12,11 +13,11 @@ Install
 npm install --save-dev sw-precache-webpack-plugin
 ```
 
-Usage
------
+Basic Usage
+-----------
 ```javascript
 var path = require('path');
-var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
+var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 
 
 module.exports = {
@@ -34,13 +35,13 @@ module.exports = {
   plugins: [
     new SWPrecacheWebpackPlugin(
       {
-        cacheId: "my-project-name",
+        cacheId: 'my-project-name',
+        filename: 'my-service-worker.js',
         maximumFileSizeToCacheInBytes: 4194304,
         runtimeCaching: [{
-          handler: "cacheFirst",
+          handler: 'cacheFirst',
           urlPattern: /[.]mp3$/,
         }],
-        verbose: true,
       }
     ),
   ]
@@ -53,53 +54,46 @@ Then you would just register it in your application:
 ```javascript
 (function() {
   if('serviceWorker' in navigator) {
-    navigator.serviceWorker  
-             .register('/service-worker.js')
-             .then(function() {
-               console.log('Service worker registered');
-             })
-             .catch(function(error) {
-               console.error('Error registering service worker: ', error);
-             });
+    navigator.serviceWorker.register('/my-service-worker.js');
   }
 })();
 ```
 
-Options
--------
-All options as specified by [sw-precache][3] are able to be passed in to the plugin.
+Configuration
+-------------
+You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
 
-I recommend omitting the `staticFileGlobs` argument and letting the plugin automatically determine the files to cache based on your bundles being built. If you omit the `staticFileGlobs` argument will add `[name]` and `[hash]` of each bundle to `staticFileGlobs`.
+__plugin options__:
+*  `filename`: `[String]` - Service worker filename, default is `service-worker.js`
+*  `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`.
 
-*  // sw-precache options:
-* @param {options: cacheId [String]},
-* @param {options: directoryIndex [String]},
-* @param {options: dynamicUrlToDependencies [Object<String,Array<String>]},
-* @param {options: handleFetch [boolean]},
-* @param {options: ignoreUrlParametersMatching [Array<Regex>]},
-* @param {options: importScripts [Array<String>]},
-* @param {options: logger [function]},
-* @param {options: maximumFileSizeToCacheInBytes [Number]},
-* @param {options: navigateFallbackWhitelist [Array<RegExp>]},
-* @param {options: replacePrefix [String]},
-* @param {options: runtimeCaching [Array<Object>]},
-* @param {options: staticFileGlobs [Array<String>]},
-* @param {options: stripPrefix [String}]
-* @param {options: templateFilePath [String]},
-* @param {options: verbose [boolean]},
+[__`sw-precache` options__][sw-precache-options]:
+* `cacheId`: `[String]` - Not required but you should include this, it will give your service worker cache a unique name
+* `directoryIndex`: `[String]`
+* `dynamicUrlToDependencies`: `[Object<String,Array<String>]`
+* `handleFetch`: `[boolean]`
+* `ignoreUrlParametersMatching`: `[Array<Regex>]`
+* `importScripts`: `[Array<String>]`
+* `logger`: `[function]`
+* `maximumFileSizeToCacheInBytes`: `[Number]`
+* `navigateFallbackWhitelist`: `[Array<RegExp>]`
+* `replacePrefix`: `[String]`
+* `runtimeCaching`: `[Array<Object>]`
+* `staticFileGlobs`: `[Array<String>]` - I recommend omitting this argument and letting the plugin automatically determine the files to cache based on your bundles' assets.
+* `stripPrefix`: `[String`
+* `templateFilePath`: `[String]`
+* `verbose`: `[boolean]`
 
-You can configure the plugin with these options (passible in the same options object as `sw-precache` options)
-*  // plugin options:
-*  @param {string} [{options: filename}] - Service worker filename, default is 'service-worker.js'
-*  @param {string} [{options: filepath}] - Service worker path and name, default is to use webpack.output.path + options.filename
 
-Example:
+_Note that all configuration options are __optional__. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler._
+
+Here's an example using one option from `sw-precache` (`cacheId`) with one option from `SWPrecacheWebpackPlugin` (`filename`) in a configuration hash:
 ```javascript
 plugins: [
   new SWPrecacheWebpackPlugin(
     {
-      filename: "my-project-service-worker.js",
       cacheId: "my-project-name",
+      filename: "my-project-service-worker.js",
     }
   ),
 ]
@@ -107,11 +101,26 @@ plugins: [
 
 Examples
 --------
-See the [examples documentation][4]
+See the [examples documentation][example-project]
+
+
+Webpack Dev Server Support
+--------------------------
+Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example].
+
 
 
 <!--references-->
-[1]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
-[2]: https://github.com/GoogleChrome/sw-precache "SW-Precache"
-[3]: https://github.com/GoogleChrome/sw-precache#options-parameter "SW-Precache Options"
-[4]: /examples/README.md
+[sw-guide]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
+[sw-precache]: https://github.com/GoogleChrome/sw-precache "SW-Precache"
+[sw-precache-options]: https://github.com/GoogleChrome/sw-precache#options-parameter "SW-Precache Options"
+[example-project]: /examples/
+[webpack]: http://webpack.github.io/
+[webpack-local-config-example]: https://github.com/hzdg/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
+
+[npm-url]: https://npmjs.org/package/sw-precache-webpack-plugin
+[npm-img]: https://badge.fury.io/js/sw-precache-webpack-plugin.svg
+[daviddm-img]: https://david-dm.org/goldhand/sw-precache-webpack-plugin.svg
+[daviddm-url]: https://david-dm.org/goldhand/sw-precache-webpack-plugin
+[daviddmdev-img]: https://david-dm.org/goldhand/sw-precache-webpack-plugin/dev-status.svg
+[daviddmdev-url]: https://david-dm.org/goldhand/sw-precache-webpack-plugin#info=devDependencies
