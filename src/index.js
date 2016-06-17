@@ -4,42 +4,40 @@ import swPrecache from 'sw-precache';
 
 
 const
-  DEFAULT_CACHE_ID = 'sw-precache-plugin',
+  DEFAULT_CACHE_ID = 'sw-precache-webpack-plugin',
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
   DEFAULT_OUTPUT_FILENAME = '[name]-[hash].js',
-  DEFAULT_OUTPUT_PATH = '.';
+  DEFAULT_OUTPUT_PATH = '';
 
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   outputFilename: DEFAULT_OUTPUT_FILENAME,
 };
 
-/* SWPrecacheWebpackPlugin - A wrapper for sw-precache to use with webpack
+/**
+ * SWPrecacheWebpackPlugin - A wrapper for sw-precache to use with webpack
  * @param {object} options - All parameters should be passed as a single options object
  *
- *  // sw-precache options:
- * @param {options: cacheId [String]},
- * @param {options: directoryIndex [String]},
- * @param {options: dynamicUrlToDependencies [Object<String,Array<String>]},
- * @param {options: handleFetch [boolean]},
- * @param {options: ignoreUrlParametersMatching [Array<Regex>]},
- * @param {options: importScripts [Array<String>]},
- * @param {options: logger [function]},
- * @param {options: maximumFileSizeToCacheInBytes [Number]},
- * @param {options: navigateFallbackWhitelist [Array<RegExp>]},
- * @param {options: replacePrefix [String]},
- * @param {options: runtimeCaching [Array<Object>]},
- * @param {options: staticFileGlobs [Array<String>]},
- * @param {options: stripPrefix [String}]
- * @param {options: templateFilePath [String]},
- * @param {options: verbose [boolean]},
+ * // sw-precache options:
+ * @param {string} [options.cacheId]
+ * @param {string} [options.directoryIndex]
+ * @param {object|array} [options.dynamicUrlToDependencies]
+ * @param {boolean} [options.handleFetch]
+ * @param {array} [options.ignoreUrlParametersMatching]
+ * @param {array} [options.importScripts]
+ * @param {function} [options.logger]
+ * @param {number} [options.maximumFileSizeToCacheInBytes]
+ * @param {array} [options.navigateFallbackWhitelist]
+ * @param {string} [options.replacePrefix]
+ * @param {array} [options.runtimeCaching]
+ * @param {array} [options.staticFileGlobs]
+ * @param {string} [options.stripPrefix]
+ * @param {string} [options.templateFilePath]
+ * @param {boolean} [options.verbose]
  *
- *  // plugin options:
- *  @param {string} [{options: filename}] - Service worker filename, default is 'service-worker.js'
- *  @param {string} [{options: filepath}] - Service worker path and name, default is to use webpack.output.path + options.filename
- *  options
-
- * @returns {undefined}
+ * // plugin options:
+ * @param {string} [options.filename] - Service worker filename, default is 'service-worker.js'
+ * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  */
 class SWPrecacheWebpackPlugin {
 
@@ -63,23 +61,26 @@ class SWPrecacheWebpackPlugin {
 
     compiler.plugin('done', (stats) => {
 
-      // What is the output path specified in webpack config
+      // get the output path specified in webpack config
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
 
       const staticFileGlobs = getAssetGlobs(stats.compilation).map(f => path.join(outputPath, f));
 
-      staticFileGlobs.push(path.join(outputPath, 'index.html'));
-
       const config = {
-        // staticFileGlobs: [outputPath + '/*'],
-        staticFileGlobs: staticFileGlobs,
-        stripPrefix: outputPath,
+        staticFileGlobs,
         verbose: true,
       };
+
+      if (outputPath) {
+        // strip the webpack config's output.path
+        config.stripPrefix = `${outputPath}/`;
+      }
+
       if (compiler.options.output.publicPath) {
         // prepend the public path to the resources
         config.replacePrefix = compiler.options.output.publicPath;
       }
+
       this.writeServiceWorker(compiler, config);
     });
   }

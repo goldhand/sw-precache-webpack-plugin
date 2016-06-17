@@ -79,13 +79,13 @@ __plugin options__:
 * `navigateFallbackWhitelist`: `[Array<RegExp>]`
 * `replacePrefix`: `[String]`
 * `runtimeCaching`: `[Array<Object>]`
-* `staticFileGlobs`: `[Array<String>]` - I recommend omitting this argument and letting the plugin automatically determine the files to cache based on your bundles' assets.
-* `stripPrefix`: `[String`
+* `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets.
+* `stripPrefix`: `[String]` - Omit this to use your webpack config's `output.path + '/'` for stripping prefixes.
 * `templateFilePath`: `[String]`
 * `verbose`: `[boolean]`
 
 
-_Note that all configuration options are __optional__. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler._
+_Note that all configuration options are optional. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler for the `staticFileGlobs` parameter and your webpack config's `output.path + '/'` as the `stripPrefix` parameter (see [#4](/../../issues/4/))._
 
 Here's an example using one option from `sw-precache` (`cacheId`) with one option from `SWPrecacheWebpackPlugin` (`filename`) in a configuration hash:
 ```javascript
