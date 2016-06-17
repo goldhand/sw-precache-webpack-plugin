@@ -46,15 +46,6 @@ class SWPrecacheWebpackPlugin {
       ...DEFAULT_OPTIONS,
       ...options,
     };
-
-    // Depreciate
-    if (this.options.options) {
-      console.warn('\n[sw-precache-webpack-plugin] DeprecationWarning: options.options is depreciated. \nJust pass options along with other objects in a single {options} object as argument.\n');
-      this.options = {
-        ...this.options,
-        ...this.options.options,
-      };
-    }
   }
 
   apply(compiler) {
