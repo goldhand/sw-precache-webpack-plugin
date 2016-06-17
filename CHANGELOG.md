@@ -1,3 +1,10 @@
+## 0.2.4
+
+* fixed missing dependency
+* Update readmes with better examples, explanations and badges
+* Fix example link
+* Fix example errors
+
 ## 0.2.3
 
 * Add example project
