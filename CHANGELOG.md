@@ -1,3 +1,8 @@
+## 0.3.0
+
+* Drop support for options.options
+* Add trailing / to output.path for stripPrefix
+
 ## 0.2.4
 
 * fixed missing dependency
