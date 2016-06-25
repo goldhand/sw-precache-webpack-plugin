@@ -1,3 +1,8 @@
+## 0.3.1
+
+* Update example to use filename and isolate service-worker script
+* Fix filename option
+
 ## 0.3.0
 
 * Drop support for options.options
