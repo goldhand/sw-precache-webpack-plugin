@@ -6,12 +6,11 @@ import swPrecache from 'sw-precache';
 const
   DEFAULT_CACHE_ID = 'sw-precache-webpack-plugin',
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
-  DEFAULT_OUTPUT_FILENAME = '[name]-[hash].js',
   DEFAULT_OUTPUT_PATH = '';
 
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
-  outputFilename: DEFAULT_OUTPUT_FILENAME,
+  filename: DEFAULT_WORKER_FILENAME,
 };
 
 /**
@@ -80,7 +79,7 @@ class SWPrecacheWebpackPlugin {
     const
       fileDir = compiler.options.output.path || DEFAULT_OUTPUT_PATH,
       // default to options.filepath for writing service worker location
-      filepath = this.options.filepath || path.join(fileDir, DEFAULT_WORKER_FILENAME),
+      filepath = this.options.filepath || path.join(fileDir, this.options.filename),
       workerOptions = {
         ...config,
         ...this.options,
