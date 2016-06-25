@@ -17,7 +17,7 @@ Start the server
 Open __localhost:3000__ in your browser to see the example project.
 ---------------------------------
 
-The service worker is registered in the [`default.ejs` template](/examples/src/templates/default.ejs)
+The service worker is registered in the [`register-service-worker.ejs` template](/examples/src/templates/register-service-worker.ejs)
 
 The `SWPrecacheWebpackPlugin` is in the plugins of the [`webpack.config.js` file](/examples/webpack.config.js)
 

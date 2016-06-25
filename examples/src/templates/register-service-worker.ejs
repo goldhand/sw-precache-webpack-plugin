@@ -1,0 +1,31 @@
+<% if (serviceWorker) { %>
+
+  <div><h1>Service worker detected: <span id="sw-msg"></span></h1></div>
+  <script type="text/javascript">
+
+  // Register Service worker
+  (function(serviceWorkerFilename) {
+    // serviceWorkerFilename === './my-service-worker.js' as specified in webpack.config.js
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register(serviceWorkerFilename)
+        .then(function() {
+          log('Service worker registered!');
+        })
+        .catch(function(error) {
+          log('Error registering service worker: ', error);
+        });
+    } else {
+      log('Not supported by browser');
+    }
+  })('<%= serviceWorker%>');
+
+
+  // logger
+  function log(msg) {
+    var swMsg = document.getElementById('sw-msg');
+    console.log(msg);
+    swMsg.innerText = msg;
+  }
+  </script>
+<% } %>

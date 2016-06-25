@@ -4,6 +4,13 @@ const
   SWPrecacheWebpackPlugin = require('../lib/index'),
   HtmlWebpackPlugin = require('html-webpack-plugin');
 
+// sw-precache-webpack-plugin configurations
+const SERVICE_WORKER_FILENAME = 'my-service-worker.js';
+const SERVICE_WORKER_CACHEID = 'my-project-name';
+const SW_PRECACHE_CONFIG = {
+  cacheId: SERVICE_WORKER_CACHEID,
+  filename: SERVICE_WORKER_FILENAME,
+};
 
 const HTML_WEBPACK_OPTIONS = {
   main: {
@@ -11,7 +18,7 @@ const HTML_WEBPACK_OPTIONS = {
     template: 'src/templates/default.ejs',
     inject: false,
     appMountId: 'main',
-    serviceWorker: '/service-worker.js',
+    serviceWorker: `/${SERVICE_WORKER_FILENAME}`,
   },
 };
 
@@ -34,10 +41,9 @@ module.exports = {
       name: 'vendor',
       minChunks: Infinity,
       filename: 'vendor-[hash].js',
+      chuncks: ['react', 'redux'],
     }),
-    new SWPrecacheWebpackPlugin({
-      cacheId: 'my-project-name',
-    }),
+    new SWPrecacheWebpackPlugin(SW_PRECACHE_CONFIG),
   ], // add all common plugins here
 
   module: {
