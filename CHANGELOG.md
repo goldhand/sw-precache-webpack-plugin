@@ -1,3 +1,8 @@
+## 0.4.0
+
+* Add link to official register example
+* Update dependencies
+
 ## 0.3.1
 
 * Update example to use filename and isolate service-worker script
