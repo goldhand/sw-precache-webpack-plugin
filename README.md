@@ -59,6 +59,8 @@ Then you would just register it in your application:
 })();
 ```
 
+[Another example of registering a service worker is provided by GoogleChrome/sw-precache][sw-precache-registration-example]
+
 Configuration
 -------------
 You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
@@ -114,6 +116,7 @@ Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If 
 [sw-guide]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
 [sw-precache]: https://github.com/GoogleChrome/sw-precache "SW-Precache"
 [sw-precache-options]: https://github.com/GoogleChrome/sw-precache#options-parameter "SW-Precache Options"
+[sw-precache-registration-example]: https://github.com/GoogleChrome/sw-precache/blob/5699e5d049235ef0f668e8e2aa3bf2646ba3872f/demo/app/js/service-worker-registration.js
 [example-project]: /examples/
 [webpack]: http://webpack.github.io/
 [webpack-local-config-example]: https://github.com/hzdg/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
