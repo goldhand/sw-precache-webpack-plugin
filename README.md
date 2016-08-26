@@ -24,12 +24,12 @@ module.exports = {
   context: __dirname,
 
   entry: {
-    main: path.resolve(__dirname, 'src/index'),
+    main: path.resolve(__dirname, 'src/index')
   },
 
   output: {
     path: path.resolve(__dirname, 'src/bundles/'),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
@@ -40,10 +40,10 @@ module.exports = {
         maximumFileSizeToCacheInBytes: 4194304,
         runtimeCaching: [{
           handler: 'cacheFirst',
-          urlPattern: /[.]mp3$/,
-        }],
+          urlPattern: /[.]mp3$/
+        }]
       }
-    ),
+    )
   ]
 }
 ```
