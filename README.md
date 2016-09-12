@@ -68,6 +68,7 @@ You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
 __plugin options__:
 *  `filename`: `[String]` - Service worker filename, default is `service-worker.js`
 *  `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`.
+*  `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
 
 [__`sw-precache` options__][sw-precache-options]:
 * `cacheId`: `[String]` - Not required but you should include this, it will give your service worker cache a unique name
