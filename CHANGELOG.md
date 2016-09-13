@@ -1,3 +1,8 @@
+## 0.5.0
+
+* Add test
+* Add `staticFileGlobsIgnorePatterns` option
+
 ## 0.4.0
 
 * Add link to official register example
