@@ -14,6 +14,11 @@ build: clean build_es6
 lint:
 	@node_modules/.bin/eslint src
 
+exampletest:
+	@cd examples && npm install && npm t && npm run webpack
+
+test: lint build exampletest
+
 major:
 	npm version major
 

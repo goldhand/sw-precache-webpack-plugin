@@ -112,6 +112,26 @@ Webpack Dev Server Support
 Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example].
 
 
+Contributing
+------------
+
+Install node dependencies:
+
+```
+  $ npm install
+```
+
+Run tests
+
+Tests
+-----
+
+```
+  $ npm t
+```
+
+
+
 
 <!--references-->
 [sw-guide]: https://github.com/goldhand/notes/blob/master/notes/service_workers.md "Introduction to service workers"
