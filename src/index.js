@@ -54,7 +54,15 @@ class SWPrecacheWebpackPlugin {
       // get the output path specified in webpack config
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
 
-      const staticFileGlobs = getAssetGlobs(stats.compilation).map(f => path.join(outputPath, f));
+      // get all assets outputted by webpack
+      const assetGlobs = getAssetGlobs(stats.compilation).map(f => path.join(outputPath, f));
+
+      const ignorePatterns = this.options.staticFileGlobsIgnorePatterns || [];
+
+      // filter staticFileGlobs from ignorePatterns
+      const staticFileGlobs = assetGlobs.filter(text =>
+        (!ignorePatterns.some((regex) => regex.test(text)))
+      );
 
       const config = {
         staticFileGlobs,
