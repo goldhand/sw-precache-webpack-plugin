@@ -34,9 +34,12 @@
     "url": "https://github.com/goldhand/sw-precache-webpack-plugin/issues"
   },
   "homepage": "https://github.com/goldhand/sw-precache-webpack-plugin#readme",
+  "peerDependencies": {
+    "webpack": "^1.1.0 || ^2 || ^2.1.0-beta"
+  },
   "dependencies": {
     "del": "^2.2.2",
-    "sw-precache": "^4.0.0"
+    "sw-precache": "^4.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
