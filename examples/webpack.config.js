@@ -49,7 +49,7 @@ module.exports = {
   ], // add all common plugins here
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
@@ -72,7 +72,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['.js', '.jsx'],
     modules: [
       path.resolve(__dirname, 'src'),
       'node_modules',

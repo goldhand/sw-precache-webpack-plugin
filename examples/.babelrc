@@ -1,5 +1,16 @@
 {
-  "presets": ["es2015-webpack", "stage-0", "react"],
+  "presets": [
+    "stage-0", "react",
+    [
+      "es2015",
+      {
+          "modules": false
+      }
+    ]
+  ],
+  "plugins": [
+    "transform-class-properties",
+  ],
   "env": {
     "development": {},
     "production": {}

@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, browserHistory} from 'react-router';
+import App from 'components/App';
 import {Provider} from 'react-redux';
 
-import routes from './routes';
 import {createStore} from 'redux';
 import rootReducer from './reducers';
 
@@ -18,7 +17,7 @@ if (typeof document !== 'undefined') {
 
   ReactDOM.render(
     <Provider store={STORE}>
-      <Router history={browserHistory} routes={routes} />
+      <App />
     </Provider>,
     document.getElementById(ROOT_ELEMENT)
   );

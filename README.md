@@ -140,7 +140,7 @@ Tests
 [sw-precache-registration-example]: https://github.com/GoogleChrome/sw-precache/blob/5699e5d049235ef0f668e8e2aa3bf2646ba3872f/demo/app/js/service-worker-registration.js
 [example-project]: /examples/
 [webpack]: http://webpack.github.io/
-[webpack-local-config-example]: https://github.com/hzdg/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
+[webpack-local-config-example]: https://github.com/goldhand/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
 
 [npm-url]: https://npmjs.org/package/sw-precache-webpack-plugin
 [npm-img]: https://badge.fury.io/js/sw-precache-webpack-plugin.svg

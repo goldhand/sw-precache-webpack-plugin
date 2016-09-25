@@ -1,6 +1,0 @@
-{
-  "name": "Counter",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./Counter.js"
-}
