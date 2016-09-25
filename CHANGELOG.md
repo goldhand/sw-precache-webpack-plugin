@@ -1,3 +1,8 @@
+## 0.5.1
+
+* Add webpack 2 beta peer dependency
+* Remove some of example
+
 ## 0.5.0
 
 * Add test
