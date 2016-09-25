@@ -3,6 +3,7 @@ SW Precache Webpack Plugin
 [![NPM version][npm-img]][npm-url]
 [![Dependency Status][daviddm-img]][daviddm-url]
 [![devDependency Status][daviddmdev-img]][daviddmdev-url]
+[![CircleCI][circleci-img]][circleci-url]
 
 __`SWPrecacheWebpackPlugin`__ is a [webpack][webpack] plugin for using [service workers][sw-guide] to cache your external project dependencies. It will generate a service worker file using [sw-precache][sw-precache] and add it to your build directory.
 
@@ -148,3 +149,5 @@ Tests
 [daviddm-url]: https://david-dm.org/goldhand/sw-precache-webpack-plugin
 [daviddmdev-img]: https://david-dm.org/goldhand/sw-precache-webpack-plugin/dev-status.svg
 [daviddmdev-url]: https://david-dm.org/goldhand/sw-precache-webpack-plugin#info=devDependencies
+[circleci-img]: https://circleci.com/gh/goldhand/sw-precache-webpack-plugin.svg?style=svg
+[circleci-url]: https://circleci.com/gh/goldhand/sw-precache-webpack-plugin

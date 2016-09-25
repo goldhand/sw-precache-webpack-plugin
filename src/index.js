@@ -37,6 +37,7 @@ const DEFAULT_OPTIONS = {
  * // plugin options:
  * @param {string} [options.filename] - Service worker filename, default is 'service-worker.js'
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
+ * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
  */
 class SWPrecacheWebpackPlugin {
 
