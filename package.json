@@ -8,6 +8,9 @@
     "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md",
     "test": "make test"
   },
+  "engines" : {
+    "node" : ">=5"
+  },
   "keywords": [
     "webpack",
     "plugin",
