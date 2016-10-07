@@ -43,7 +43,7 @@ module.exports = {
       name: 'vendor',
       minChunks: Infinity,
       filename: 'vendor-[hash].js',
-      chuncks: ['react', 'redux'],
+      chunks: ['react', 'redux'],
     }),
     new SWPrecacheWebpackPlugin(SW_PRECACHE_CONFIG),
   ], // add all common plugins here
