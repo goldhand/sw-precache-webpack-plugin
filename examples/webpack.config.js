@@ -57,7 +57,7 @@ module.exports = {
       },
       {
         test: /\.ejs$/,
-        loader: 'ejs',
+        loader: 'ejs-loader',
         query: {
           includePaths: [
             path.resolve(__dirname, 'src/templates/'),

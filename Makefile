@@ -14,10 +14,13 @@ build: clean build_es6
 lint:
 	@node_modules/.bin/eslint src
 
+unittest:
+	@node_modules/.bin/ava test/plugin.spec.js
+
 exampletest:
 	@cd examples && npm install && npm t && npm run webpack
 
-test: lint build exampletest
+test: lint build unittest exampletest
 
 major:
 	npm version major

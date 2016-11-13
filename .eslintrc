@@ -12,10 +12,7 @@
 
   "parserOptions": {
     "ecmaVersion": 7,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
+    "sourceType": "module"
   },
 
   "rules": {
@@ -55,8 +52,6 @@
       },
       "requireParamDescription": false,
     }],
-
-    "jsx-quotes": [2, "prefer-double"],
 
     "babel/object-shorthand": 0,
     "babel/generator-star-spacing": [2, {"before": true, "after": false}],
