@@ -77,7 +77,7 @@ __plugin options__:
 * `dynamicUrlToDependencies`: `[Object<String,Array<String>]`
 * `handleFetch`: `[boolean]`
 * `ignoreUrlParametersMatching`: `[Array<Regex>]`
-* `importScripts`: `[Array<String>]`
+* `importScripts`: `[Array<String>]` - Add [hash] if you want to import a file generated with webpack [hash] ex. ['dist/some-[hash].js']
 * `logger`: `[function]`
 * `maximumFileSizeToCacheInBytes`: `[Number]`
 * `navigateFallbackWhitelist`: `[Array<RegExp>]`

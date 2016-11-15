@@ -80,6 +80,11 @@ class SWPrecacheWebpackPlugin {
         config.replacePrefix = compiler.options.output.publicPath;
       }
 
+      // add hash to importScripts
+      const scripts = this.options.importScripts || [];
+      const importScripts = scripts.map(f => f.replace(/\[hash\]/g, stats.hash));
+      this.options.importScripts = importScripts;
+
       this.writeServiceWorker(compiler, config);
     });
   }
