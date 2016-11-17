@@ -122,11 +122,14 @@ Install node dependencies:
   $ npm install
 ```
 
-Run tests
+Add unit tests for your new feature in `./test/plugin.spec.js`
 
-Tests
------
 
+Testing
+-------
+Tests are located in `./test`
+
+Run tests:
 ```
   $ npm t
 ```

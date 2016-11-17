@@ -1,4 +1,5 @@
-BUILD_CMD := ./node_modules/.bin/babel ./src -d ./lib --ignore '__tests__' --presets es2015,stage-0
+BUILD_CMD := ./node_modules/.bin/babel ./src -d ./lib --ignore 'test' --presets es2015,stage-0
+TEST_CMD := ./node_modules/.bin/ava test/plugin.spec.js
 
 build_es6:
 	@$(BUILD_CMD)
@@ -8,19 +9,20 @@ ci:
 
 clean:
 	@rm -rf ./lib
+	@rm -rf ./test/tmp
 
 build: clean build_es6
 
 lint:
 	@node_modules/.bin/eslint src
 
-unittest:
-	@node_modules/.bin/ava test/plugin.spec.js
+unit_test:
+	@$(TEST_CMD)
 
-exampletest:
+integration_test:
 	@cd examples && npm install && npm t && npm run webpack
 
-test: lint build unittest exampletest
+test: lint build unit_test integration_test
 
 major:
 	npm version major
