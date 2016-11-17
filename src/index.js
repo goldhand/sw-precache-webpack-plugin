@@ -56,7 +56,9 @@ class SWPrecacheWebpackPlugin {
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
 
       // get all assets outputted by webpack
-      const assetGlobs = getAssetGlobs(stats.compilation).map(f => path.join(outputPath, f));
+      const assetGlobs = Array
+        .from(stats.compilation.assets)
+        .map(f => path.join(outputPath, f));
 
       const ignorePatterns = this.options.staticFileGlobsIgnorePatterns || [];
 
@@ -103,14 +105,6 @@ class SWPrecacheWebpackPlugin {
       return swPrecache.write(filepath, workerOptions);
     });
   }
-}
-
-function getAssetGlobs(compilation) {
-  const assets = [];
-  for (const asset in compilation.assets) {
-    assets.push(asset);
-  }
-  return assets;
 }
 
 
