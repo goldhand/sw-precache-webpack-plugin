@@ -131,7 +131,16 @@ test('can set filepath', t => {
 
 /** SWPrecacheWebpackPlugin methods */
 
-test.serial.cb('#writeServiceWorker(comiler, config)', t => {
+/**
+ * fsExists promise
+ * @param {string} fp - filepath to check exists
+ * @returns {Promise} fsExists
+ */
+const fsExists = (fp) => new Promise(
+  resolve => fs.access(fp, err => resolve(!err))
+);
+
+test.serial('#writeServiceWorker(comiler, config)', async t => {
   t.plan(2);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
@@ -140,21 +149,9 @@ test.serial.cb('#writeServiceWorker(comiler, config)', t => {
 
   plugin.apply(compiler);
 
-  fs.exists(
-    filepath,
-    shouldNotExist => {
-      t.falsy(shouldNotExist, 'service-worker should not exist');
-      plugin.writeServiceWorker(compiler, plugin.options).then(() => {
-        fs.exists(
-          filepath,
-          shouldExist => {
-            t.truthy(shouldExist, 'service-worker should exists');
-            t.end();
-          },
-        );
-      });
-    }
-  );
+  t.falsy(await fsExists(filepath), 'service-worker should not exist yet');
+  await plugin.writeServiceWorker(compiler, plugin.options);
+  t.truthy(await fsExists(filepath), 'service-worker should exist');
 
 });
 
@@ -162,7 +159,7 @@ test.cb('#apply(compiler)', t => {
   t.plan(2);
 
   const compiler = webpack(webpackConfig());
-  const plugin = new SWPrecacheWebpackPlugin({verbose: false});
+  const plugin = new SWPrecacheWebpackPlugin();
 
   plugin.apply(compiler);
 
