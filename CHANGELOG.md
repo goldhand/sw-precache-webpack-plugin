@@ -1,3 +1,18 @@
+## 0.6.1
+
+* Update dependencies
+* Add unit tests for writeServiceWorker and apply methods
+* Remove useless getAssetGlobs function
+
+## 0.6.0
+
+* Add spec tests and basic test [WIP]
+* Update dependencies
+* Allow to use [hash] on importScripts
+* Fix typo
+* Add circleci config
+* Add node engine
+
 ## 0.5.1
 
 * Add webpack 2 beta peer dependency
