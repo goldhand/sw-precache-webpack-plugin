@@ -1,3 +1,8 @@
+## 0.6.2
+
+* Array.from returning empty array
+* Use async/await for writeServiceWorker test
+
 ## 0.6.1
 
 * Update dependencies
