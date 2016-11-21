@@ -42,7 +42,8 @@
   },
   "dependencies": {
     "del": "^2.2.2",
-    "sw-precache": "^4.1.0"
+    "sw-precache": "^4.1.0",
+    "uglify-js": "^2.7.4"
   },
   "devDependencies": {
     "ava": "^0.17.0",
