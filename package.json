@@ -1,6 +1,6 @@
 {
   "name": "sw-precache-webpack-plugin",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Webpack plugin for using service workers",
   "main": "lib/index.js",
   "scripts": {

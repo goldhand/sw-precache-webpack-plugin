@@ -1,3 +1,7 @@
+## 0.6.3
+
+* Use publicPath for importScripts
+
 ## 0.6.2
 
 * Array.from returning empty array
