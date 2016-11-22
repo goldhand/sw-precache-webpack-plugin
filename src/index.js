@@ -83,8 +83,11 @@ class SWPrecacheWebpackPlugin {
       }
 
       // add hash to importScripts
+      const publicPath = compiler.options.output.publicPath || '';
       const scripts = this.options.importScripts || [];
-      const importScripts = scripts.map(f => f.replace(/\[hash\]/g, stats.hash));
+      const importScripts = scripts
+        .map(f => f.replace(/\[hash\]/g, stats.hash))
+        .map(f => path.join(publicPath, f));
       this.options.importScripts = importScripts;
 
       this.writeServiceWorker(compiler, config);
