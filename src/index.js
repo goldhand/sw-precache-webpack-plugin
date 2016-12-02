@@ -46,6 +46,7 @@ class SWPrecacheWebpackPlugin {
       ...DEFAULT_OPTIONS,
       ...options,
     };
+    this.overrides = {};
   }
 
   apply(compiler) {
@@ -88,7 +89,7 @@ class SWPrecacheWebpackPlugin {
       const importScripts = scripts
         .map(f => f.replace(/\[hash\]/g, stats.hash))
         .map(f => path.join(publicPath, f));
-      this.options.importScripts = importScripts;
+      this.overrides.importScripts = importScripts;
 
       this.writeServiceWorker(compiler, config);
     });
@@ -102,7 +103,10 @@ class SWPrecacheWebpackPlugin {
       workerOptions = {
         ...config,
         ...this.options,
+        ...this.overrides,
       };
+
+    this.options.importScripts = config.importScripts;
 
     return del(filepath).then(() => {
       return swPrecache.write(filepath, workerOptions);
