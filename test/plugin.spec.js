@@ -155,34 +155,6 @@ test.serial('#writeServiceWorker(comiler, config)', async t => {
 
 });
 
-test.serial('#shouldKeepTheHashTagOnImportScriptsAfterWritingSw(comiler, config)', async t => {
-  t.plan(1);
-
-  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
-  const compiler = webpack(webpackConfig());
-  const plugin = new SWPrecacheWebpackPlugin({filepath,importScripts:['some_sw-[hash].js']});
-
-  plugin.apply(compiler);
-  
-  await plugin.writeServiceWorker(compiler, plugin.options);
-  t.truthy(plugin.options.importScripts[0] === 'some_sw-[hash].js', 'hash should be preserve after writing the sw');
-
-});
-
-test.serial('#shouldNotModifyImportScriptsSectionWhenNoHashIsProvided(comiler, config)', async t => {
-  t.plan(1);
-
-  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
-  const compiler = webpack(webpackConfig());
-  const plugin = new SWPrecacheWebpackPlugin({filepath,importScripts:['some_script.js']});
-
-  plugin.apply(compiler);
-  
-  await plugin.writeServiceWorker(compiler, plugin.options);
-  t.truthy(plugin.options.importScripts[0] === 'some_script.js', 'importScripts should not be modified');
-
-});
-
 test.cb('#apply(compiler)', t => {
   t.plan(2);
 
@@ -196,5 +168,33 @@ test.cb('#apply(compiler)', t => {
     t.is(typeof stats, 'object');
     t.end();
   });
+
+});
+
+test.serial('should keep [hash] in importScripts after writing SW', async t => {
+  t.plan(1);
+
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({filepath, importScripts: ['some_sw-[hash].js']});
+
+  plugin.apply(compiler);
+
+  await plugin.writeServiceWorker(compiler, plugin.options);
+  t.truthy(plugin.options.importScripts[0] === 'some_sw-[hash].js', 'hash should be preserve after writing the sw');
+
+});
+
+test.serial('should not modify importScripts value when no hash is provided', async t => {
+  t.plan(1);
+
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({filepath, importScripts: ['some_script.js']});
+
+  plugin.apply(compiler);
+
+  await plugin.writeServiceWorker(compiler, plugin.options);
+  t.truthy(plugin.options.importScripts[0] === 'some_script.js', 'importScripts should not be modified');
 
 });
