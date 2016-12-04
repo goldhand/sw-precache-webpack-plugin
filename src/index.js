@@ -1,4 +1,5 @@
 import path from 'path';
+import url from 'url';
 import del from 'del';
 import swPrecache from 'sw-precache';
 
@@ -6,7 +7,9 @@ import swPrecache from 'sw-precache';
 const
   DEFAULT_CACHE_ID = 'sw-precache-webpack-plugin',
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
-  DEFAULT_OUTPUT_PATH = '';
+  DEFAULT_OUTPUT_PATH = '',
+  DEFAULT_PUBLIC_PATH = '',
+  DEFAULT_IMPORT_SCRIPTS = [];
 
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
@@ -46,6 +49,7 @@ class SWPrecacheWebpackPlugin {
       ...DEFAULT_OPTIONS,
       ...options,
     };
+    this.overrides = {};
   }
 
   apply(compiler) {
@@ -54,6 +58,12 @@ class SWPrecacheWebpackPlugin {
 
       // get the output path specified in webpack config
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
+
+      // get the public path specified in webpack config
+      const publicPath = compiler.options.output.publicPath || DEFAULT_PUBLIC_PATH;
+
+      // get the importScripts value specified in the sw-precache config
+      const importScripts = this.options.importScripts || DEFAULT_IMPORT_SCRIPTS;
 
       // get all assets outputted by webpack
       const assetGlobs = Object
@@ -74,21 +84,19 @@ class SWPrecacheWebpackPlugin {
 
       if (outputPath) {
         // strip the webpack config's output.path
-        config.stripPrefix = `${outputPath}/`;
+        config.stripPrefix = `${outputPath}${path.sep}`;
       }
 
-      if (compiler.options.output.publicPath) {
+      if (publicPath) {
         // prepend the public path to the resources
-        config.replacePrefix = compiler.options.output.publicPath;
+        config.replacePrefix = publicPath;
       }
 
-      // add hash to importScripts
-      const publicPath = compiler.options.output.publicPath || '';
-      const scripts = this.options.importScripts || [];
-      const importScripts = scripts
-        .map(f => f.replace(/\[hash\]/g, stats.hash))
-        .map(f => path.join(publicPath, f));
-      this.options.importScripts = importScripts;
+      if (importScripts) {
+        this.overrides.importScripts = importScripts
+          .map(f => f.replace(/\[hash\]/g, stats.hash)) // need to override importScripts with stats.hash
+          .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
+      }
 
       this.writeServiceWorker(compiler, config);
     });
@@ -102,6 +110,7 @@ class SWPrecacheWebpackPlugin {
       workerOptions = {
         ...config,
         ...this.options,
+        ...this.overrides,
       };
 
     return del(filepath).then(() => {
