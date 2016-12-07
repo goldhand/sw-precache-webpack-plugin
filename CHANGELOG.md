@@ -1,3 +1,8 @@
+## 0.7.0
+
+* Refactor importScripts default behavior
+* Fix preserving the [hash], so it will update the new hash when running in watch mode
+
 ## 0.6.3
 
 * Use publicPath for importScripts
