@@ -7,11 +7,11 @@ const
 // sw-precache-webpack-plugin configurations
 const SERVICE_WORKER_FILENAME = 'my-service-worker.js';
 const SERVICE_WORKER_CACHEID = 'my-project-name';
-const SERVICE_WORKER_IGONRE_PATTERNS = [/dist\/.*\.html/];
+const SERVICE_WORKER_IGNORE_PATTERNS = [/dist\/.*\.html/];
 const SW_PRECACHE_CONFIG = {
   cacheId: SERVICE_WORKER_CACHEID,
   filename: SERVICE_WORKER_FILENAME,
-  staticFileGlobsIgnorePatterns: SERVICE_WORKER_IGONRE_PATTERNS,
+  staticFileGlobsIgnorePatterns: SERVICE_WORKER_IGNORE_PATTERNS,
 };
 
 const HTML_WEBPACK_OPTIONS = {
