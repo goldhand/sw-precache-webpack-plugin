@@ -54,7 +54,7 @@ class SWPrecacheWebpackPlugin {
 
   apply(compiler) {
 
-    compiler.plugin('done', (stats) => {
+    compiler.plugin('after-emit', (compilation, done) => {
 
       // get the output path specified in webpack config
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
@@ -67,7 +67,7 @@ class SWPrecacheWebpackPlugin {
 
       // get all assets outputted by webpack
       const assetGlobs = Object
-        .keys(stats.compilation.assets)
+        .keys(compilation.assets)
         .map(f => path.join(outputPath, f));
 
       const ignorePatterns = this.options.staticFileGlobsIgnorePatterns || [];
@@ -94,11 +94,11 @@ class SWPrecacheWebpackPlugin {
 
       if (importScripts) {
         this.overrides.importScripts = importScripts
-          .map(f => f.replace(/\[hash\]/g, stats.hash)) // need to override importScripts with stats.hash
+          .map(f => f.replace(/\[hash\]/g, compilation.hash)) // need to override importScripts with stats.hash
           .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
       }
 
-      this.writeServiceWorker(compiler, config);
+      this.writeServiceWorker(compiler, config).then(done);
     });
   }
 
