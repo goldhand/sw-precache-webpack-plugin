@@ -54,7 +54,7 @@ class SWPrecacheWebpackPlugin {
 
   apply(compiler) {
 
-    compiler.plugin('after-emit', (compilation, done) => {
+    compiler.plugin('after-emit', (compilation, callback) => {
 
       // get the output path specified in webpack config
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
@@ -98,7 +98,10 @@ class SWPrecacheWebpackPlugin {
           .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
       }
 
-      this.writeServiceWorker(compiler, config).then(done);
+      const done = () => callback();
+      const error = (err) => callback(err);
+
+      this.writeServiceWorker(compiler, config).then(done, error);
     });
   }
 
