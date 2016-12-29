@@ -1,3 +1,10 @@
+## 0.7.1
+
+* Update webpack peer dependency
+* Add error handling for promise
+* Hook plugin to &#39;after-emit&#39; to ensure async execution
+* Correct typos
+
 ## 0.7.0
 
 * Refactor importScripts default behavior
