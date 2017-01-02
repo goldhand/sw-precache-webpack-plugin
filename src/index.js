@@ -14,6 +14,7 @@ const
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   filename: DEFAULT_WORKER_FILENAME,
+  forceDelete: false
 };
 
 /**
@@ -116,7 +117,7 @@ class SWPrecacheWebpackPlugin {
         ...this.overrides,
       };
 
-    return del(filepath).then(() => {
+    return del(filepath, { ...this.options.forceDelete }).then(() => {
       return swPrecache.write(filepath, workerOptions);
     });
   }
