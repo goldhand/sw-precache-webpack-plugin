@@ -14,7 +14,7 @@ const
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   filename: DEFAULT_WORKER_FILENAME,
-  forceDelete: false
+  forceDelete: true
 };
 
 /**
