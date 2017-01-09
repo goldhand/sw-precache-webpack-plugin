@@ -12,6 +12,7 @@ import fs from 'fs';
 const DEFAULT_OPTIONS = {
   cacheId: 'sw-precache-webpack-plugin',
   filename: 'service-worker.js',
+  forceDelete: false,
 };
 
 const webpackConfig = () => {

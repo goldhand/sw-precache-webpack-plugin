@@ -14,7 +14,7 @@ const
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   filename: DEFAULT_WORKER_FILENAME,
-  forceDelete: true
+  forceDelete: false,
 };
 
 /**
@@ -42,6 +42,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} [options.filename] - Service worker filename, default is 'service-worker.js'
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
+ * @param {boolean} [options.forceDelete=false] - pass force option to del
  */
 class SWPrecacheWebpackPlugin {
 
@@ -117,7 +118,7 @@ class SWPrecacheWebpackPlugin {
         ...this.overrides,
       };
 
-    return del(filepath, { ...this.options.forceDelete }).then(() => {
+    return del(filepath, {force: this.options.forceDelete}).then(() => {
       return swPrecache.write(filepath, workerOptions);
     });
   }
