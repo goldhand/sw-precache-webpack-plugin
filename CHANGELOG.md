@@ -1,3 +1,9 @@
+## 0.7.2
+
+* Add warning when using filepath option
+* Fix failing tests from pr #38
+* pass force option to `del` (#38)
+
 ## 0.7.1
 
 * Update webpack peer dependency
