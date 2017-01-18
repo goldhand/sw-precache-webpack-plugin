@@ -4,6 +4,8 @@ import del from 'del';
 import swPrecache from 'sw-precache';
 
 
+const FILEPATH_WARNING = 'sw-prechache-webpack-plugin filepath: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
+
 const
   DEFAULT_CACHE_ID = 'sw-precache-webpack-plugin',
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
@@ -42,7 +44,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} [options.filename] - Service worker filename, default is 'service-worker.js'
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
- * @param {boolean} [options.forceDelete=false] - pass force option to del
+ * @param {boolean} [options.forceDelete=false] - Pass force option to del
  */
 class SWPrecacheWebpackPlugin {
 
@@ -62,10 +64,15 @@ class SWPrecacheWebpackPlugin {
       const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
 
       // get the public path specified in webpack config
-      const publicPath = compiler.options.output.publicPath || DEFAULT_PUBLIC_PATH;
+      const {publicPath = DEFAULT_PUBLIC_PATH} = compiler.options.output;
 
       // get the importScripts value specified in the sw-precache config
-      const importScripts = this.options.importScripts || DEFAULT_IMPORT_SCRIPTS;
+      const {importScripts = DEFAULT_IMPORT_SCRIPTS} = this.options;
+
+      if (this.options.filepath) {
+        // warn about changing filepath
+        compilation.warnings.push(new Error(FILEPATH_WARNING));
+      }
 
       // get all assets outputted by webpack
       const assetGlobs = Object
@@ -111,7 +118,7 @@ class SWPrecacheWebpackPlugin {
     const
       fileDir = compiler.options.output.path || DEFAULT_OUTPUT_PATH,
       // default to options.filepath for writing service worker location
-      filepath = this.options.filepath || path.join(fileDir, this.options.filename),
+      {filepath = path.join(fileDir, this.options.filename)} = this.options,
       workerOptions = {
         ...config,
         ...this.options,

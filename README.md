@@ -1,8 +1,8 @@
 SW Precache Webpack Plugin
 ==========================
 [![NPM version][npm-img]][npm-url]
+[![NPM downloads][npm-downloads-img]][npm-url]
 [![Dependency Status][daviddm-img]][daviddm-url]
-[![devDependency Status][daviddmdev-img]][daviddmdev-url]
 [![CircleCI][circleci-img]][circleci-url]
 
 __`SWPrecacheWebpackPlugin`__ is a [webpack][webpack] plugin for using [service workers][sw-guide] to cache your external project dependencies. It will generate a service worker file using [sw-precache][sw-precache] and add it to your build directory.
@@ -68,8 +68,9 @@ You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
 
 __plugin options__:
 *  `filename`: `[String]` - Service worker filename, default is `service-worker.js`
-*  `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`.
+*  `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will overried `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
 *  `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
+* `forceDelete`: `[boolean]` - Pass force option to del, default is false.
 
 [__`sw-precache` options__][sw-precache-options]:
 * `cacheId`: `[String]` - Not required but you should include this, it will give your service worker cache a unique name
@@ -148,9 +149,8 @@ Run tests:
 
 [npm-url]: https://npmjs.org/package/sw-precache-webpack-plugin
 [npm-img]: https://badge.fury.io/js/sw-precache-webpack-plugin.svg
+[npm-downloads-img]: https://img.shields.io/npm/dm/sw-precache-webpack-plugin.svg?style=flat-square
 [daviddm-img]: https://david-dm.org/goldhand/sw-precache-webpack-plugin.svg
 [daviddm-url]: https://david-dm.org/goldhand/sw-precache-webpack-plugin
-[daviddmdev-img]: https://david-dm.org/goldhand/sw-precache-webpack-plugin/dev-status.svg
-[daviddmdev-url]: https://david-dm.org/goldhand/sw-precache-webpack-plugin#info=devDependencies
 [circleci-img]: https://circleci.com/gh/goldhand/sw-precache-webpack-plugin.svg?style=svg
 [circleci-url]: https://circleci.com/gh/goldhand/sw-precache-webpack-plugin
