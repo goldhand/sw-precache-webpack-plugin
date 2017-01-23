@@ -127,21 +127,18 @@ class SWPrecacheWebpackPlugin {
         ...this.options,
         ...this.overrides,
       };
-    return del(filepath, {force: this.options.forceDelete}).then(() => {
-      return swPrecache.generate(workerOptions);
-    }).then((serviceWorkerFileContents) => {
-      if (this.options.minify) {
-        const uglifyFiles = {};
-        uglifyFiles[this.options.filename] = serviceWorkerFileContents;
-        const minifedCode = UglifyJS.minify(uglifyFiles, {
-          fromString: true,
-        });
-        return minifedCode;
-      }
-      return serviceWorkerFileContents;
-    }).then((possiblyMinifiedServiceWorkerFileContents) => {
-      return fs.writeFile(filepath, possiblyMinifiedServiceWorkerFileContents);
-    });
+    return del(filepath, {force: this.options.forceDelete})
+      .then(() => swPrecache.generate(workerOptions))
+      .then((serviceWorkerFileContents) => {
+        if (this.options.minify) {
+          const uglifyFiles = {};
+          uglifyFiles[this.options.filename] = serviceWorkerFileContents;
+          const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
+          return minifedCodeObj.code;
+        }
+        return serviceWorkerFileContents;
+      })
+      .then((possiblyMinifiedServiceWorkerFileContents) => fs.writeFileSync(filepath, possiblyMinifiedServiceWorkerFileContents));
   }
 }
 
