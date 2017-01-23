@@ -7,7 +7,14 @@ import webpack from 'webpack';
 import SWPrecacheWebpackPlugin from '../lib';
 import path from 'path';
 import fs from 'fs';
+import sinon from 'sinon';
+import UglifyJS from 'uglify-js';
+import mkdirp from 'mkdirp';
+import bluebirdPromise from 'bluebird';
+bluebirdPromise.promisifyAll(fs);
+bluebirdPromise.promisifyAll(mkdirp);
 
+const outputPath = path.resolve(__dirname, 'tmp');
 
 const DEFAULT_OPTIONS = {
   cacheId: 'sw-precache-webpack-plugin',
@@ -24,7 +31,7 @@ const webpackConfig = () => {
       main: path.resolve(__dirname, 'stubs/entry'),
     },
     output: {
-      path: path.resolve(__dirname, 'tmp'),
+      path: outputPath,
       filename: '[name].js',
     },
   };
@@ -32,6 +39,9 @@ const webpackConfig = () => {
   return config;
 };
 
+test.before(async t => {
+  await mkdirp(outputPath);
+});
 
 /** SWPrecacheWebpackPlugin constructor paramaters */
 
