@@ -35,7 +35,7 @@ const webpackConfig = () => {
 
 /** SWPrecacheWebpackPlugin constructor paramaters */
 
-test('will use defualt options', t => {
+test('will use default options', t => {
 
   const plugin = new SWPrecacheWebpackPlugin();
 
@@ -43,7 +43,7 @@ test('will use defualt options', t => {
 
 });
 
-test('can set chacheId', t => {
+test('can set cacheId', t => {
 
   const altConfig = {
     cacheId: 'alt-cache-id',
@@ -156,7 +156,7 @@ const fsExists = (fp) => new Promise(
   resolve => fs.access(fp, err => resolve(!err))
 );
 
-test.serial('#writeServiceWorker(comiler, config)', async t => {
+test.serial('#writeServiceWorker(compiler, config)', async t => {
   t.plan(2);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
