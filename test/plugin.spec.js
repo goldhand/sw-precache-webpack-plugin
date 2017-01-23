@@ -224,3 +224,32 @@ test.serial('should not modify importScripts value when no hash is provided', as
   t.truthy(plugin.options.importScripts[0] === 'some_script.js', 'importScripts should not be modified');
 
 });
+
+test.serial('uses UglifyJS to minify code', async t => {
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const compiler1 = webpack(webpackConfig());
+  const withoutMinificationPlugin = new SWPrecacheWebpackPlugin({filepath, minify: false});
+  withoutMinificationPlugin.apply(compiler1);
+  await withoutMinificationPlugin.writeServiceWorker(compiler1, withoutMinificationPlugin.options);
+  const withoutMinificationFileContents = await fs.readFileAsync(filepath);
+  // spy on uglify
+  const uglifyMock = sinon.mock(UglifyJS);
+  const minifyExpectation = uglifyMock.expects('minify');
+  minifyExpectation.once();
+  minifyExpectation.returns({code: 'minified string', map: null});
+  minifyExpectation.withExactArgs({
+    'service-worker.js': withoutMinificationFileContents.toString(),
+  }, {
+    fromString: true,
+  });
+  const compiler2 = webpack(webpackConfig());
+  const withMinificationPlugin = new SWPrecacheWebpackPlugin({filepath, minify: true});
+  withMinificationPlugin.apply(compiler2);
+  await withMinificationPlugin.writeServiceWorker(compiler2, withMinificationPlugin.options);
+  // verify uglify js was called correctly
+  minifyExpectation.verify();
+  uglifyMock.restore();
+  // check if minified code was written correctly
+  const withMinificationFileContents = await fs.readFileAsync(filepath);
+  t.deepEqual(withMinificationFileContents.toString(), 'minified string');
+});
