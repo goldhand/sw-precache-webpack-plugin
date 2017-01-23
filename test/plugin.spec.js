@@ -13,6 +13,7 @@ const DEFAULT_OPTIONS = {
   cacheId: 'sw-precache-webpack-plugin',
   filename: 'service-worker.js',
   forceDelete: false,
+  minify : false,
 };
 
 const webpackConfig = () => {
@@ -127,6 +128,20 @@ test('can set filepath', t => {
     ...DEFAULT_OPTIONS,
     ...altConfig,
   });
+});
+
+test('can set minify', t => {
+
+	const altConfig = {
+		minify: true,
+	};
+
+	const plugin = new SWPrecacheWebpackPlugin(altConfig);
+
+	t.deepEqual(plugin.options, {
+		...DEFAULT_OPTIONS,
+		...altConfig,
+	});
 });
 
 
