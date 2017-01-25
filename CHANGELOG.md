@@ -1,3 +1,9 @@
+## 0.8.0
+
+* Add minify to docs
+* update sw-precache version
+* Add option to minify ServiceWorker file (#25)
+
 ## 0.7.2
 
 * Add warning when using filepath option
