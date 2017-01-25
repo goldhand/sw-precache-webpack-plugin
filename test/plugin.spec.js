@@ -7,12 +7,20 @@ import webpack from 'webpack';
 import SWPrecacheWebpackPlugin from '../lib';
 import path from 'path';
 import fs from 'fs';
+import sinon from 'sinon';
+import UglifyJS from 'uglify-js';
+import mkdirp from 'mkdirp';
+import bluebirdPromise from 'bluebird';
+bluebirdPromise.promisifyAll(fs);
+bluebirdPromise.promisifyAll(mkdirp);
 
+const outputPath = path.resolve(__dirname, 'tmp');
 
 const DEFAULT_OPTIONS = {
   cacheId: 'sw-precache-webpack-plugin',
   filename: 'service-worker.js',
   forceDelete: false,
+  minify: false,
 };
 
 const webpackConfig = () => {
@@ -23,7 +31,7 @@ const webpackConfig = () => {
       main: path.resolve(__dirname, 'stubs/entry'),
     },
     output: {
-      path: path.resolve(__dirname, 'tmp'),
+      path: outputPath,
       filename: '[name].js',
     },
   };
@@ -31,10 +39,13 @@ const webpackConfig = () => {
   return config;
 };
 
+test.before(async t => {
+  await mkdirp(outputPath);
+});
 
 /** SWPrecacheWebpackPlugin constructor paramaters */
 
-test('will use defualt options', t => {
+test('will use default options', t => {
 
   const plugin = new SWPrecacheWebpackPlugin();
 
@@ -42,7 +53,7 @@ test('will use defualt options', t => {
 
 });
 
-test('can set chacheId', t => {
+test('can set cacheId', t => {
 
   const altConfig = {
     cacheId: 'alt-cache-id',
@@ -129,6 +140,20 @@ test('can set filepath', t => {
   });
 });
 
+test('can set minify', t => {
+
+  const altConfig = {
+    minify: true,
+  };
+
+  const plugin = new SWPrecacheWebpackPlugin(altConfig);
+
+  t.deepEqual(plugin.options, {
+    ...DEFAULT_OPTIONS,
+    ...altConfig,
+  });
+});
+
 
 /** SWPrecacheWebpackPlugin methods */
 
@@ -141,7 +166,7 @@ const fsExists = (fp) => new Promise(
   resolve => fs.access(fp, err => resolve(!err))
 );
 
-test.serial('#writeServiceWorker(comiler, config)', async t => {
+test.serial('#writeServiceWorker(compiler, config)', async t => {
   t.plan(2);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
@@ -198,4 +223,33 @@ test.serial('should not modify importScripts value when no hash is provided', as
   await plugin.writeServiceWorker(compiler, plugin.options);
   t.truthy(plugin.options.importScripts[0] === 'some_script.js', 'importScripts should not be modified');
 
+});
+
+test.serial('uses UglifyJS to minify code', async t => {
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const compiler1 = webpack(webpackConfig());
+  const withoutMinificationPlugin = new SWPrecacheWebpackPlugin({filepath, minify: false});
+  withoutMinificationPlugin.apply(compiler1);
+  await withoutMinificationPlugin.writeServiceWorker(compiler1, withoutMinificationPlugin.options);
+  const withoutMinificationFileContents = await fs.readFileAsync(filepath);
+  // spy on uglify
+  const uglifyMock = sinon.mock(UglifyJS);
+  const minifyExpectation = uglifyMock.expects('minify');
+  minifyExpectation.once();
+  minifyExpectation.returns({code: 'minified string', map: null});
+  minifyExpectation.withExactArgs({
+    'service-worker.js': withoutMinificationFileContents.toString(),
+  }, {
+    fromString: true,
+  });
+  const compiler2 = webpack(webpackConfig());
+  const withMinificationPlugin = new SWPrecacheWebpackPlugin({filepath, minify: true});
+  withMinificationPlugin.apply(compiler2);
+  await withMinificationPlugin.writeServiceWorker(compiler2, withMinificationPlugin.options);
+  // verify uglify js was called correctly
+  minifyExpectation.verify();
+  uglifyMock.restore();
+  // check if minified code was written correctly
+  const withMinificationFileContents = await fs.readFileAsync(filepath);
+  t.deepEqual(withMinificationFileContents.toString(), 'minified string');
 });

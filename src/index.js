@@ -2,7 +2,8 @@ import path from 'path';
 import url from 'url';
 import del from 'del';
 import swPrecache from 'sw-precache';
-
+import UglifyJS from 'uglify-js';
+import fs from 'fs';
 
 const FILEPATH_WARNING = 'sw-prechache-webpack-plugin filepath: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
 
@@ -17,6 +18,7 @@ const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   filename: DEFAULT_WORKER_FILENAME,
   forceDelete: false,
+  minify: false,
 };
 
 /**
@@ -45,6 +47,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
  * @param {boolean} [options.forceDelete=false] - Pass force option to del
+ * @param {boolean} [options.minify] - Minify the generated Service worker file using UglifyJS
  */
 class SWPrecacheWebpackPlugin {
 
@@ -124,10 +127,18 @@ class SWPrecacheWebpackPlugin {
         ...this.options,
         ...this.overrides,
       };
-
-    return del(filepath, {force: this.options.forceDelete}).then(() => {
-      return swPrecache.write(filepath, workerOptions);
-    });
+    return del(filepath, {force: this.options.forceDelete})
+      .then(() => swPrecache.generate(workerOptions))
+      .then((serviceWorkerFileContents) => {
+        if (this.options.minify) {
+          const uglifyFiles = {};
+          uglifyFiles[this.options.filename] = serviceWorkerFileContents;
+          const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
+          return minifedCodeObj.code;
+        }
+        return serviceWorkerFileContents;
+      })
+      .then((possiblyMinifiedServiceWorkerFileContents) => fs.writeFileSync(filepath, possiblyMinifiedServiceWorkerFileContents));
   }
 }
 

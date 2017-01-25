@@ -42,7 +42,8 @@
   },
   "dependencies": {
     "del": "^2.2.2",
-    "sw-precache": "^4.1.0"
+    "sw-precache": "^4.1.0",
+    "uglify-js": "^2.7.4"
   },
   "devDependencies": {
     "ava": "^0.17.0",
@@ -50,9 +51,12 @@
     "babel-eslint": "^7.1.0",
     "babel-preset-es2015": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
+    "bluebird": "^3.4.7",
     "eslint": "^3.7.1",
     "eslint-plugin-babel": "^4.0.0",
     "git-release-notes": "0.0.2",
+    "mkdirp": "^0.5.1",
+    "sinon": "^1.17.7",
     "webpack": "^1.13.2"
   }
 }
