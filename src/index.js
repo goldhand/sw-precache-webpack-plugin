@@ -47,7 +47,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
  * @param {boolean} [options.forceDelete=false] - Pass force option to del
- * @param {boolean} [options.minify] - Minify the generated Service worker file using UglifyJS
+ * @param {boolean} [options.minify=false] - Minify the generated Service worker file using UglifyJS
  */
 class SWPrecacheWebpackPlugin {
 

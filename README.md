@@ -39,6 +39,7 @@ module.exports = {
         cacheId: 'my-project-name',
         filename: 'my-service-worker.js',
         maximumFileSizeToCacheInBytes: 4194304,
+        minify: true,
         runtimeCaching: [{
           handler: 'cacheFirst',
           urlPattern: /[.]mp3$/,
@@ -67,9 +68,10 @@ Configuration
 You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
 
 __plugin options__:
-*  `filename`: `[String]` - Service worker filename, default is `service-worker.js`
-*  `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will overried `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
-*  `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
+* `filename`: `[String]` - Service worker filename, default is `service-worker.js`
+* `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will overried `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
+* `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
+* `minify`: `[boolean]` - Set to true to minify and uglify the generated service-worker, default is false.
 * `forceDelete`: `[boolean]` - Pass force option to del, default is false.
 
 [__`sw-precache` options__][sw-precache-options]:
