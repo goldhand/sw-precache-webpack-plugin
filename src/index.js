@@ -39,6 +39,7 @@ const DEFAULT_OPTIONS = {
  * @param {array} [options.runtimeCaching]
  * @param {array} [options.staticFileGlobs]
  * @param {string} [options.stripPrefix]
+ * @param {string} [options.stripPrefixMulti]
  * @param {string} [options.templateFilePath]
  * @param {boolean} [options.verbose]
  *

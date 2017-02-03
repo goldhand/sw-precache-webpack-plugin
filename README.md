@@ -86,8 +86,9 @@ __plugin options__:
 * `navigateFallbackWhitelist`: `[Array<RegExp>]`
 * `replacePrefix`: `[String]`
 * `runtimeCaching`: `[Array<Object>]`
-* `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets.
-* `stripPrefix`: `[String]` - Omit this to use your webpack config's `output.path + '/'` for stripping prefixes.
+* `staticFileGlobs`: `[Array<String>]` - Will be merged with your bundles' emitted assets.
+* `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
+* `stripPrefixMulti`: `[Object<String,String>]` - Will be merged with your webpack config's `output.path + '/'` for stripping prefixes.
 * `templateFilePath`: `[String]`
 * `verbose`: `[boolean]`
 
