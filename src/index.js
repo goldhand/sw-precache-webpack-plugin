@@ -84,19 +84,27 @@ class SWPrecacheWebpackPlugin {
 
       const ignorePatterns = this.options.staticFileGlobsIgnorePatterns || [];
 
-      // filter staticFileGlobs from ignorePatterns
-      const staticFileGlobs = assetGlobs.filter(text =>
+      // merge assetGlobs with provided staticFileGlobs and filter using ignorePatterns
+      const staticFileGlobs = assetGlobs.concat(this.options.staticFileGlobs || []).filter(text =>
         (!ignorePatterns.some((regex) => regex.test(text)))
       );
 
       const config = {
         staticFileGlobs,
+        // use provided stripPrefixMulti if there is one, then work from there
+        stripPrefixMulti: {...this.options.stripPrefixMulti},
         verbose: true,
       };
 
+      if (this.options.stripPrefix) {
+        // add stripPrefix to stripPrefixMulti and delete it so we make sure only stripPrefixMulti is used
+        config.stripPrefixMulti[this.options.stripPrefix] = '';
+        delete this.options.stripPrefix;
+      }
+
       if (outputPath) {
         // strip the webpack config's output.path
-        config.stripPrefix = `${outputPath}${path.sep}`;
+        config.stripPrefixMulti[`${outputPath}${path.sep}`] = '';
       }
 
       if (publicPath) {
@@ -125,6 +133,8 @@ class SWPrecacheWebpackPlugin {
       workerOptions = {
         ...config,
         ...this.options,
+        staticFileGlobs: config.staticFileGlobs,
+        stripPrefixMulti: config.stripPrefixMulti,
         ...this.overrides,
       };
     return del(filepath, {force: this.options.forceDelete})
