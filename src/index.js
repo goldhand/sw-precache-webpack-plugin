@@ -18,6 +18,7 @@ const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   filename: DEFAULT_WORKER_FILENAME,
   forceDelete: false,
+  mergeStaticsConfig: false,
   minify: false,
 };
 
@@ -48,6 +49,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
  * @param {boolean} [options.forceDelete=false] - Pass force option to del
+ * @param {boolean} [options.mergeStaticsConfig=false] - Merge provided staticFileGlobs and stripPrefix(Multi) with webpack's config, rather than having those take precedence
  * @param {boolean} [options.minify=false] - Minify the generated Service worker file using UglifyJS
  */
 class SWPrecacheWebpackPlugin {
@@ -93,15 +95,13 @@ class SWPrecacheWebpackPlugin {
       const config = {
         staticFileGlobs,
         // use provided stripPrefixMulti if there is one, then work from there
-        stripPrefixMulti: {...this.options.stripPrefixMulti},
+        stripPrefixMulti: this.options.mergeStaticsConfig ? {...this.options.stripPrefixMulti} : {},
         verbose: true,
       };
 
-      if (this.options.stripPrefix) {
+      if (this.options.mergeStaticsConfig && this.options.stripPrefix) {
         // add stripPrefix to stripPrefixMulti and delete it so we make sure only stripPrefixMulti is used
         config.stripPrefixMulti[this.options.stripPrefix] = this.options.replacePrefix || '';
-        delete this.options.stripPrefix;
-        delete this.options.replacePrefix;
       }
 
       if (outputPath) {
@@ -130,10 +130,16 @@ class SWPrecacheWebpackPlugin {
       workerOptions = {
         ...config,
         ...this.options,
-        staticFileGlobs: config.staticFileGlobs,
-        stripPrefixMulti: config.stripPrefixMulti,
         ...this.overrides,
       };
+
+    if (this.options.mergeStaticsConfig) {
+      workerOptions.staticFileGlobs = config.staticFileGlobs;
+      workerOptions.stripPrefixMulti = config.stripPrefixMulti;
+      delete workerOptions.stripPrefix;
+      delete workerOptions.replacePrefix;
+    }
+
     return del(filepath, {force: this.options.forceDelete})
       .then(() => swPrecache.generate(workerOptions))
       .then((serviceWorkerFileContents) => {

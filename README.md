@@ -71,6 +71,7 @@ __plugin options__:
 * `filename`: `[String]` - Service worker filename, default is `service-worker.js`
 * `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will overried `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
 * `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
+* `mergeStaticsConfig`: `[boolean]` - Merge provided staticFileGlobs and stripPrefix(Multi) with webpack's config, rather than having those take precedence, default is false.
 * `minify`: `[boolean]` - Set to true to minify and uglify the generated service-worker, default is false.
 * `forceDelete`: `[boolean]` - Pass force option to del, default is false.
 
@@ -84,11 +85,11 @@ __plugin options__:
 * `logger`: `[function]`
 * `maximumFileSizeToCacheInBytes`: `[Number]`
 * `navigateFallbackWhitelist`: `[Array<RegExp>]`
-* `replacePrefix`: `[String]`
+* `replacePrefix`: `[String]` - Should only be used in conjunction with `stripPrefix`
 * `runtimeCaching`: `[Array<Object>]`
-* `staticFileGlobs`: `[Array<String>]` - Will be merged with your bundles' emitted assets.
+* `staticFileGlobs`: `[Array<String>]` - If `mergeStaticsConfig=true`: will be merged with your bundles' emitted assets. Otherwise this property takes precedence and emitted assets won't be included.
 * `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
-* `stripPrefixMulti`: `[Object<String,String>]` - Will be merged with your webpack config's `output.path + '/'` for stripping prefixes.
+* `stripPrefixMulti`: `[Object<String,String>]` - If `mergeStaticsConfig=true`: will be merged with your webpack's output.path => publicPath for stripping prefixes. Otherwise this property (or `stripPrefix`) takes precedence and Webpack's output path won't be replaced.
 * `templateFilePath`: `[String]`
 * `verbose`: `[boolean]`
 
@@ -102,6 +103,25 @@ plugins: [
     {
       cacheId: "my-project-name",
       filename: "my-project-service-worker.js",
+    }
+  ),
+]
+```
+
+Here's a more elaborate example with `mergeStaticsConfig: true` and `staticFileGlobsIgnorePatterns`. `mergeStaticsConfig: true` allows you to add some additional static file globs to the emitted ServiceWorker file alongside Webpack's emitted assets. `staticFileGlobsIgnorePatterns` can be used to avoid including sourcemap file references in the generated ServiceWorker.
+```javascript
+plugins: [
+  new SWPrecacheWebpackPlugin(
+    {
+      cacheId: "my-project-name",
+      filename: "my-project-service-worker.js",
+      staticFileGlobs: [
+        'src/static/img/**.*',
+        'src/static/styles.css',
+      ],
+      stripPrefix: 'src/static/', // stripPrefixMulti is also supported
+      mergeStaticsConfig: true, // if you don't set this to true, you won't see any webpack-emitted assets in your serviceworker config
+      staticFileGlobsIgnorePatterns: [/\.map$/], // use this to ignore sourcemap files
     }
   ),
 ]
