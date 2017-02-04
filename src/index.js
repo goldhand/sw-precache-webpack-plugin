@@ -18,6 +18,7 @@ const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
   filename: DEFAULT_WORKER_FILENAME,
   forceDelete: false,
+  mergeStaticsConfig: false,
   minify: false,
 };
 
@@ -39,6 +40,7 @@ const DEFAULT_OPTIONS = {
  * @param {array} [options.runtimeCaching]
  * @param {array} [options.staticFileGlobs]
  * @param {string} [options.stripPrefix]
+ * @param {string} [options.stripPrefixMulti]
  * @param {string} [options.templateFilePath]
  * @param {boolean} [options.verbose]
  *
@@ -47,6 +49,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
  * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
  * @param {boolean} [options.forceDelete=false] - Pass force option to del
+ * @param {boolean} [options.mergeStaticsConfig=false] - Merge provided staticFileGlobs and stripPrefix(Multi) with webpack's config, rather than having those take precedence
  * @param {boolean} [options.minify=false] - Minify the generated Service worker file using UglifyJS
  */
 class SWPrecacheWebpackPlugin {
@@ -84,24 +87,26 @@ class SWPrecacheWebpackPlugin {
 
       const ignorePatterns = this.options.staticFileGlobsIgnorePatterns || [];
 
-      // filter staticFileGlobs from ignorePatterns
-      const staticFileGlobs = assetGlobs.filter(text =>
+      // merge assetGlobs with provided staticFileGlobs and filter using ignorePatterns
+      const staticFileGlobs = assetGlobs.concat(this.options.staticFileGlobs || []).filter(text =>
         (!ignorePatterns.some((regex) => regex.test(text)))
       );
 
       const config = {
         staticFileGlobs,
+        // use provided stripPrefixMulti if there is one, then work from there
+        stripPrefixMulti: this.options.mergeStaticsConfig ? {...this.options.stripPrefixMulti} : {},
         verbose: true,
       };
 
-      if (outputPath) {
-        // strip the webpack config's output.path
-        config.stripPrefix = `${outputPath}${path.sep}`;
+      if (this.options.mergeStaticsConfig && this.options.stripPrefix) {
+        // add stripPrefix to stripPrefixMulti and delete it so we make sure only stripPrefixMulti is used
+        config.stripPrefixMulti[this.options.stripPrefix] = this.options.replacePrefix || '';
       }
 
-      if (publicPath) {
-        // prepend the public path to the resources
-        config.replacePrefix = publicPath;
+      if (outputPath) {
+        // strip the webpack config's output.path
+        config.stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath || '';
       }
 
       if (importScripts) {
@@ -127,6 +132,14 @@ class SWPrecacheWebpackPlugin {
         ...this.options,
         ...this.overrides,
       };
+
+    if (this.options.mergeStaticsConfig) {
+      workerOptions.staticFileGlobs = config.staticFileGlobs;
+      workerOptions.stripPrefixMulti = config.stripPrefixMulti;
+      delete workerOptions.stripPrefix;
+      delete workerOptions.replacePrefix;
+    }
+
     return del(filepath, {force: this.options.forceDelete})
       .then(() => swPrecache.generate(workerOptions))
       .then((serviceWorkerFileContents) => {
