@@ -99,18 +99,14 @@ class SWPrecacheWebpackPlugin {
 
       if (this.options.stripPrefix) {
         // add stripPrefix to stripPrefixMulti and delete it so we make sure only stripPrefixMulti is used
-        config.stripPrefixMulti[this.options.stripPrefix] = '';
+        config.stripPrefixMulti[this.options.stripPrefix] = this.options.replacePrefix || '';
         delete this.options.stripPrefix;
+        delete this.options.replacePrefix;
       }
 
       if (outputPath) {
         // strip the webpack config's output.path
-        config.stripPrefixMulti[`${outputPath}${path.sep}`] = '';
-      }
-
-      if (publicPath) {
-        // prepend the public path to the resources
-        config.replacePrefix = publicPath;
+        config.stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath || '';
       }
 
       if (importScripts) {
