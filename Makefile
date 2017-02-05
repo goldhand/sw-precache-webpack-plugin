@@ -16,10 +16,10 @@ build: clean build_es6
 lint:
 	@node_modules/.bin/eslint src
 
-unit_test:
+unit_test: build
 	@$(TEST_CMD)
 
-integration_test:
+integration_test: build
 	@cd examples && npm install && npm t && npm run webpack
 
 test: lint build unit_test integration_test

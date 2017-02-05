@@ -6,6 +6,8 @@
   "scripts": {
     "prepublish": "make build",
     "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md",
+    "test:unit": "make unit_test",
+    "test:integration": "make integration_test",
     "test": "make test"
   },
   "engines": {

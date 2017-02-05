@@ -19,6 +19,8 @@ const outputPath = path.resolve(__dirname, 'tmp');
 const DEFAULT_OPTIONS = {
   cacheId: 'sw-precache-webpack-plugin',
   filename: 'service-worker.js',
+  importScripts: [],
+  staticFileGlobsIgnorePatterns: [],
   forceDelete: false,
   mergeStaticsConfig: false,
   minify: false,
@@ -34,13 +36,34 @@ const webpackConfig = () => {
     output: {
       path: outputPath,
       filename: '[name].js',
+      publicPath: 'http://localhost:3000/assets/',
     },
   };
 
   return config;
 };
 
-test.before(async t => {
+
+/**
+ * runCompiler promise
+ * @param {object} compiler - webpack compiler instance
+ * @returns {Promise} - resolves webpack stats
+*/
+const runCompiler = (compiler) => new Promise(
+  resolve => compiler.run((err, stats) => resolve(stats))
+);
+
+/**
+ * fsExists promise
+ * @param {string} fp - filepath to check exists
+ * @returns {Promise} fsExists
+ */
+const fsExists = (fp) => new Promise(
+  resolve => fs.access(fp, err => resolve(!err))
+);
+
+
+test.before(async () => {
   await mkdirp(outputPath);
 });
 
@@ -156,16 +179,8 @@ test('can set minify', t => {
 });
 
 
-/** SWPrecacheWebpackPlugin methods */
 
-/**
- * fsExists promise
- * @param {string} fp - filepath to check exists
- * @returns {Promise} fsExists
- */
-const fsExists = (fp) => new Promise(
-  resolve => fs.access(fp, err => resolve(!err))
-);
+/** SWPrecacheWebpackPlugin methods */
 
 test.serial('#writeServiceWorker(compiler, config)', async t => {
   t.plan(2);
@@ -253,4 +268,131 @@ test.serial('uses UglifyJS to minify code', async t => {
   // check if minified code was written correctly
   const withMinificationFileContents = await fs.readFileAsync(filepath);
   t.deepEqual(withMinificationFileContents.toString(), 'minified string');
+});
+
+
+/** Test overriding behaviors */
+
+
+test.serial('@staticFileGlobs generates default value', async t => {
+  t.plan(1);
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin();
+
+  plugin.apply(compiler);
+
+  await runCompiler(compiler);
+
+  const expected = [path.resolve(outputPath, 'main.js')];
+  const actual = plugin.workerOptions.staticFileGlobs;
+
+  t.deepEqual(actual, expected);
+});
+
+
+test.serial('@staticFileGlobs can be overriden', async t => {
+  t.plan(1);
+  const staticFileGlobs = ['foo', 'bar'];
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({
+    staticFileGlobs,
+  });
+
+  plugin.apply(compiler);
+
+  await runCompiler(compiler);
+  const expected = staticFileGlobs;
+  const actual = plugin.workerOptions.staticFileGlobs;
+
+  t.deepEqual(actual, expected);
+});
+
+test.serial('@staticFileGlobs can be merged', async t => {
+  t.plan(1);
+  const staticFileGlobs = ['foo', 'bar'];
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({
+    staticFileGlobs,
+    mergeStaticsConfig: 1,
+  });
+
+  plugin.apply(compiler);
+
+  await runCompiler(compiler);
+  const expected = [path.resolve(outputPath, 'main.js'), ...staticFileGlobs];
+  const actual = plugin.workerOptions.staticFileGlobs;
+
+  t.deepEqual(actual, expected);
+});
+
+test.serial('@stripPrefixMulti generates default value', async t => {
+  t.plan(1);
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin();
+
+  plugin.apply(compiler);
+
+  await runCompiler(compiler);
+
+  const expected = {
+    [`${outputPath}${path.sep}`]: webpackConfig().output.publicPath,
+    '': '',  // sw-precache will modify options object, adding the stripPrefix: replacePrefix: https://github.com/GoogleChrome/sw-precache/blob/3b816c030cf0fc8a9d6bbd32f97d993da642b4c3/lib/sw-precache.js#L154
+  };
+  const actual = plugin.workerOptions.stripPrefixMulti;
+
+  t.deepEqual(actual, expected);
+});
+
+test.serial('@stripPrefixMulti can be overriden', async t => {
+  t.plan(1);
+  const stripPrefixMulti = {
+    foo: 'bar',
+  };
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({
+    stripPrefixMulti,
+  });
+
+  plugin.apply(compiler);
+
+  await runCompiler(compiler);
+
+  const expected = {
+    ...stripPrefixMulti,
+    '': '',  // sw-precache will modify options object, adding the stripPrefix: replacePrefix: https://github.com/GoogleChrome/sw-precache/blob/3b816c030cf0fc8a9d6bbd32f97d993da642b4c3/lib/sw-precache.js#L154
+  };
+  const actual = plugin.workerOptions.stripPrefixMulti;
+
+  t.deepEqual(actual, expected);
+});
+
+test.serial('@stripPrefixMulti can be merged', async t => {
+  t.plan(1);
+  const stripPrefixMulti = {
+    foo: 'bar',
+  };
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({
+    stripPrefixMulti,
+    mergeStaticsConfig: 1,
+  });
+
+  plugin.apply(compiler);
+
+  await runCompiler(compiler);
+
+  const expected = {
+    [`${outputPath}${path.sep}`]: webpackConfig().output.publicPath,
+    ...stripPrefixMulti,
+    '': '',  // sw-precache will modify options object, adding the stripPrefix: replacePrefix: https://github.com/GoogleChrome/sw-precache/blob/3b816c030cf0fc8a9d6bbd32f97d993da642b4c3/lib/sw-precache.js#L154
+  };
+  const actual = plugin.workerOptions.stripPrefixMulti;
+
+  t.deepEqual(actual, expected);
 });
