@@ -71,7 +71,7 @@ __plugin options__:
 * `filename`: `[String]` - Service worker filename, default is `service-worker.js`
 * `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will overried `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
 * `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
-* `mergeStaticsConfig`: `[boolean]` - Merge provided staticFileGlobs and stripPrefix(Multi) with webpack's config, rather than having those take precedence, default is false.
+* `mergeStaticsConfig`: `[boolean]` - Merge provided staticFileGlobs and stripPrefixMulti with webpack's config, rather than having those take precedence, default is false.
 * `minify`: `[boolean]` - Set to true to minify and uglify the generated service-worker, default is false.
 * `forceDelete`: `[boolean]` - Pass force option to del, default is false.
 
@@ -87,14 +87,30 @@ __plugin options__:
 * `navigateFallbackWhitelist`: `[Array<RegExp>]`
 * `replacePrefix`: `[String]` - Should only be used in conjunction with `stripPrefix`
 * `runtimeCaching`: `[Array<Object>]`
-* `staticFileGlobs`: `[Array<String>]` - If `mergeStaticsConfig=true`: will be merged with your bundles' emitted assets. Otherwise this property takes precedence and emitted assets won't be included.
+* `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets. If `mergeStaticsConfig=true`: this value will be merged with your bundles' emitted assets, otherwise this value is just passed to `sw-precache` and emitted assets won't be included.
 * `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
-* `stripPrefixMulti`: `[Object<String,String>]` - If `mergeStaticsConfig=true`: will be merged with your webpack's output.path => publicPath for stripping prefixes. Otherwise this property (or `stripPrefix`) takes precedence and Webpack's output path won't be replaced.
+* `stripPrefixMulti`: `[Object<String,String>]` - Omit this to use your webpack config's `output.path + '/': output.publicPath`. If `mergeStaticsConfig=true`, this value will be merged with your webpack's `output.path: publicPath` for stripping prefixes. Otherwise this property will be passed directly to `sw-precache` and Webpack's output path won't be replaced.
 * `templateFilePath`: `[String]`
 * `verbose`: `[boolean]`
 
 
-_Note that all configuration options are optional. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler for the `staticFileGlobs` parameter and your webpack config's `output.path + '/'` as the `stripPrefix` parameter (see [#4](/../../issues/4/))._
+_Note that all configuration options are optional. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler for the `staticFileGlobs` parameter and your webpack config's `{[output.path + '/']: output.publicPath}` as the `stripPrefixMulti` parameter. This behavior is probably what you want, all your webpack assets will be cached by your generated service worker. Just don't pass any arguments when you initialize this plugin, and let this plugin handle generating your `sw-precache` configuration._
+
+
+Examples
+--------
+See the [examples documentation][example-project] for more examples.
+
+The simplest use case would be:
+```javascript
+module.exports = {
+  ...
+  plugins: [
+    new SWPrecacheWebpackPlugin(),
+  ],
+  ...
+}
+```
 
 Here's an example using one option from `sw-precache` (`cacheId`) with one option from `SWPrecacheWebpackPlugin` (`filename`) in a configuration hash:
 ```javascript
@@ -126,10 +142,6 @@ plugins: [
   ),
 ]
 ```
-
-Examples
---------
-See the [examples documentation][example-project]
 
 
 Webpack Dev Server Support
