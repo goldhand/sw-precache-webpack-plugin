@@ -1,3 +1,9 @@
+## 0.9.0
+
+* Remove deprecated eslint-plugin-babel options, and drop the whole plugin now that it&#39;s no longer used.
+* Refactor merge behavior
+* Add support for staticFileGlobs option and stripPrefix(Multi) by merging them with the webpack values.
+
 ## 0.8.0
 
 * Add minify to docs
