@@ -55,7 +55,6 @@
     "babel-preset-stage-0": "^6.16.0",
     "bluebird": "^3.4.7",
     "eslint": "^3.7.1",
-    "eslint-plugin-babel": "^4.0.0",
     "git-release-notes": "0.0.2",
     "mkdirp": "^0.5.1",
     "sinon": "^1.17.7",
