@@ -6,9 +6,6 @@
   },
 
   "parser": "babel-eslint",
-  "plugins": [
-    "babel"
-  ],
 
   "parserOptions": {
     "ecmaVersion": 7,
@@ -44,7 +41,7 @@
     "yoda": [2, "never"],
 
     "no-var": 0,
-    "generator-star-spacing": 0,
+    "generator-star-spacing": [2, "before"],
 
     "valid-jsdoc": [2, {
       "prefer": {
@@ -52,9 +49,6 @@
       },
       "requireParamDescription": false,
     }],
-
-    "babel/object-shorthand": 0,
-    "babel/generator-star-spacing": [2, {"before": true, "after": false}],
 
     "no-alert": 2,
     "no-array-constructor": 2,
