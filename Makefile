@@ -1,4 +1,4 @@
-BUILD_CMD := ./node_modules/.bin/babel ./src -d ./lib --ignore 'test' --presets es2015,stage-0
+BUILD_CMD := ./node_modules/.bin/babel ./src -d ./lib --ignore 'test' --presets latest,stage-0
 TEST_CMD := ./node_modules/.bin/ava test/plugin.spec.js
 
 build_es6:
