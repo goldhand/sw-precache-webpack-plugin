@@ -1,3 +1,9 @@
+## 0.9.1
+
+* Lower node engine requirement to 4.0.0
+* Remove unused packages from example
+* :arrow_up: Update dependencies
+
 ## 0.9.0
 
 * Remove deprecated eslint-plugin-babel options, and drop the whole plugin now that it&#39;s no longer used.
