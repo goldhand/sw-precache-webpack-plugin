@@ -11,7 +11,7 @@
     "test": "make test"
   },
   "engines": {
-    "node": ">=5"
+    "node": ">=4.0.0"
   },
   "keywords": [
     "webpack",
