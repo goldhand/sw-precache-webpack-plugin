@@ -83,72 +83,110 @@ class SWPrecacheWebpackPlugin {
   }
 
   apply(compiler) {
-
     compiler.plugin('after-emit', (compilation, callback) => {
-
-      // get the defaults from options
-      const {
-        importScripts,
-        staticFileGlobsIgnorePatterns,
-        mergeStaticsConfig,
-      } = this.options;
-
-      // get the output path specified in webpack config
-      const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
-
-      // get the public path specified in webpack config
-      const {publicPath = DEFAULT_PUBLIC_PATH} = compiler.options.output;
-
-      if (this.options.filepath) {
-        // warn about changing filepath
-        compilation.warnings.push(new Error(FILEPATH_WARNING));
-      }
-
-      // get all assets outputted by webpack
-      const assetGlobs = Object
-        .keys(compilation.assets)
-        .map(f => path.join(outputPath, f));
-
-      // merge assetGlobs with provided staticFileGlobs and filter using staticFileGlobsIgnorePatterns
-      const staticFileGlobs = assetGlobs.concat(this.options.staticFileGlobs || []).filter(text =>
-        (!staticFileGlobsIgnorePatterns.some((regex) => regex.test(text)))
-      );
-
-      const stripPrefixMulti = {
-        ...this.options.stripPrefixMulti,
-      };
-
-      if (outputPath) {
-        // strip the webpack config's output.path
-        stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath;
-      }
-
-      this.config = {
-        ...this.config,
-        staticFileGlobs,
-        stripPrefixMulti,
-      };
-
-      if (importScripts) {
-        this.overrides.importScripts = importScripts
-          .map(f => f.replace(/\[hash\]/g, compilation.hash)) // need to override importScripts with stats.hash
-          .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
-      }
-
-      if (mergeStaticsConfig) {
-        // merge generated and user provided options
-        this.overrides = {
-          ...this.overrides,
-          staticFileGlobs,
-          stripPrefixMulti,
-        };
-      }
+      this.configure(compiler, compilation, callback);
 
       const done = () => callback();
       const error = (err) => callback(err);
 
       this.writeServiceWorker(compiler).then(done, error);
     });
+  }
+
+  configure(compiler, compilation) {
+
+      // get the defaults from options
+    const {
+        importScripts,
+        staticFileGlobsIgnorePatterns,
+        mergeStaticsConfig,
+      } = this.options;
+
+      // get the output path specified in webpack config
+    const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
+
+      // get the public path specified in webpack config
+    const {publicPath = DEFAULT_PUBLIC_PATH} = compiler.options.output;
+
+    if (this.options.filepath) {
+        // warn about changing filepath
+      compilation.warnings.push(new Error(FILEPATH_WARNING));
+    }
+
+      // get all assets outputted by webpack
+    const assetGlobs = Object
+        .keys(compilation.assets)
+        .map(f => path.join(outputPath, f));
+
+      // merge assetGlobs with provided staticFileGlobs and filter using staticFileGlobsIgnorePatterns
+    const staticFileGlobs = assetGlobs.concat(this.options.staticFileGlobs || []).filter(text =>
+        (!staticFileGlobsIgnorePatterns.some((regex) => regex.test(text)))
+      );
+
+    const stripPrefixMulti = {
+      ...this.options.stripPrefixMulti,
+    };
+
+    if (outputPath) {
+        // strip the webpack config's output.path
+      stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath;
+    }
+
+    this.config = {
+      ...this.config,
+      staticFileGlobs,
+      stripPrefixMulti,
+    };
+
+    if (importScripts) {
+      this.overrides.importScripts = importScripts
+          .map(f => f.replace(/\[hash\]/g, compilation.hash)) // need to override importScripts with stats.hash
+          .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
+    }
+
+    if (mergeStaticsConfig) {
+        // merge generated and user provided options
+      this.overrides = {
+        ...this.overrides,
+        staticFileGlobs,
+        stripPrefixMulti,
+      };
+    }
+
+  }
+
+
+  // createServiceWorker(compiler) {
+  //   const
+  //     fileDir = compiler.options.output.path || DEFAULT_OUTPUT_PATH,
+  //     // default to options.filepath for writing service worker location
+  //     {filepath = path.join(fileDir, this.options.filename)} = this.options;
+  //
+  //   return del(filepath, {force: this.options.forceDelete})
+  //     .then(() => swPrecache.generate(this.workerOptions))
+  //     .then((serviceWorkerFileContents) => {
+  //       if (this.options.minify) {
+  //         const uglifyFiles = {};
+  //         uglifyFiles[this.options.filename] = serviceWorkerFileContents;
+  //         const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
+  //         return minifedCodeObj.code;
+  //       }
+  //       return serviceWorkerFileContents;
+  //     })
+  //     .then((possiblyMinifiedServiceWorkerFileContents) => fs.writeFileSync(filepath, possiblyMinifiedServiceWorkerFileContents));
+  // }
+
+  createServiceWorker() {
+    return swPrecache.generate(this.workerOptions)
+      .then((serviceWorkerFileContents) => {
+        if (this.options.minify) {
+          const uglifyFiles = {};
+          uglifyFiles[this.options.filename] = serviceWorkerFileContents;
+          const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
+          return minifedCodeObj.code;
+        }
+        return serviceWorkerFileContents;
+      });
   }
 
   writeServiceWorker(compiler) {
@@ -158,17 +196,8 @@ class SWPrecacheWebpackPlugin {
       {filepath = path.join(fileDir, this.options.filename)} = this.options;
 
     return del(filepath, {force: this.options.forceDelete})
-      .then(() => swPrecache.generate(this.workerOptions))
-      .then((serviceWorkerFileContents) => {
-        if (this.options.minify) {
-          const uglifyFiles = {};
-          uglifyFiles[this.options.filename] = serviceWorkerFileContents;
-          const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
-          return minifedCodeObj.code;
-        }
-        return serviceWorkerFileContents;
-      })
-      .then((possiblyMinifiedServiceWorkerFileContents) => fs.writeFileSync(filepath, possiblyMinifiedServiceWorkerFileContents));
+      .then(() => this.createServiceWorker())
+      .then(serviceWorker => fs.writeFileSync(filepath, serviceWorker));
   }
 }
 
