@@ -3,7 +3,8 @@ import url from 'url';
 import swPrecache from 'sw-precache';
 import UglifyJS from 'uglify-js';
 
-const FILEPATH_WARNING = 'sw-prechache-webpack-plugin filepath: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
+const FILEPATH_WARNING = 'sw-prechache-webpack-plugin [filepath]: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
+const FORCEDELETE_WARNING = 'sw-prechache-webpack-plugin [forceDelete]: You are specifying the option forceDelete. This was removed in v0.10. It should not affect your build but should no longer be required.';
 
 
 const
@@ -18,7 +19,6 @@ const DEFAULT_OPTIONS = {
   filename: DEFAULT_WORKER_FILENAME,
   importScripts: DEFAULT_IMPORT_SCRIPTS,
   staticFileGlobsIgnorePatterns: DEFAULT_IGNORE_PATTERNS,
-  forceDelete: false,
   mergeStaticsConfig: false,
   minify: false,
 };
@@ -29,33 +29,15 @@ class SWPrecacheWebpackPlugin {
   /**
    * SWPrecacheWebpackPlugin - A wrapper for sw-precache to use with webpack
    * @constructor
-   * @param {object} options - All parameters should be passed as a single options object
-   *
-   * // sw-precache options:
-   * @param {string} [options.cacheId]
-   * @param {string} [options.directoryIndex]
-   * @param {object|array} [options.dynamicUrlToDependencies]
-   * @param {boolean} [options.handleFetch]
-   * @param {array} [options.ignoreUrlParametersMatching]
-   * @param {array} [options.importScripts]
-   * @param {function} [options.logger]
-   * @param {number} [options.maximumFileSizeToCacheInBytes]
-   * @param {array} [options.navigateFallbackWhitelist]
-   * @param {string} [options.replacePrefix]
-   * @param {array} [options.runtimeCaching]
-   * @param {array} [options.staticFileGlobs]
-   * @param {string} [options.stripPrefix]
-   * @param {string} [options.stripPrefixMulti]
-   * @param {string} [options.templateFilePath]
-   * @param {boolean} [options.verbose]
+   * @param {object} options - All parameters should be passed as a single options object. All sw-precache options can be passed here in addition to plugin options.
    *
    * // plugin options:
    * @param {string} [options.filename] - Service worker filename, default is 'service-worker.js'
    * @param {string} [options.filepath] - Service worker path and name, default is to use webpack.output.path + options.filename
    * @param {RegExp} [options.staticFileGlobsIgnorePatterns[]] - Define an optional array of regex patterns to filter out of staticFileGlobs
-   * @param {boolean} [options.forceDelete=false] - Pass force option to del
    * @param {boolean} [options.mergeStaticsConfig=false] - Merge provided staticFileGlobs and stripPrefix(Multi) with webpack's config, rather than having those take precedence
    * @param {boolean} [options.minify=false] - Minify the generated Service worker file using UglifyJS
+   * @param {boolean} [options.debug=false] - Output error and warning messages
    */
   constructor(options) {
     // generated configuration options
@@ -67,6 +49,8 @@ class SWPrecacheWebpackPlugin {
     };
     // generated configuration that will override user options
     this.overrides = {};
+    // push warning messages here
+    this.warnings = [];
   }
 
   /**
@@ -91,13 +75,14 @@ class SWPrecacheWebpackPlugin {
       // generate service worker then write to file system
       this.createServiceWorker()
         .then(serviceWorker => this.writeServiceWorker(serviceWorker, compiler, callback))
+        .then(this.checkWarnings(compilation))
         .then(done, error);
     });
   }
 
   configure(compiler, compilation) {
 
-      // get the defaults from options
+    // get the defaults from options
     const {
         importScripts,
         staticFileGlobsIgnorePatterns,
@@ -112,11 +97,6 @@ class SWPrecacheWebpackPlugin {
 
     // get the public path specified in webpack config
     const {publicPath = DEFAULT_PUBLIC_PATH} = compiler.options.output;
-
-    if (this.options.filepath) {
-        // warn about changing filepath
-      compilation.warnings.push(new Error(FILEPATH_WARNING));
-    }
 
     // get all assets outputted by webpack
     const assetGlobs = Object
@@ -182,6 +162,27 @@ class SWPrecacheWebpackPlugin {
     // use the outputFileSystem api to manually write service workers rather than adding to the compilation assets
     return compiler.outputFileSystem.mkdirp(path.resolve(filepath, '..'),
       () => compiler.outputFileSystem.writeFile(filepath, serviceWorker, callback));
+  }
+
+  /**
+   * Push plugin warnings to webpack log
+   * @param {object} compilation - webpack compilation
+   * @returns {void}
+   */
+  checkWarnings(compilation) {
+    if (this.options.filepath) {
+      // warn about changing filepath
+      this.warnings.push(new Error(FILEPATH_WARNING));
+    }
+
+    if (this.options.forceDelete) {
+      // deprecate forceDelete
+      this.warnings.push(new Error(FORCEDELETE_WARNING));
+    }
+
+    if (this.workerOptions.debug) {
+      this.warnings.forEach(warning => compilation.warnings.push(warning));
+    }
   }
 }
 

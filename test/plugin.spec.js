@@ -4,7 +4,7 @@
 
 import test from 'ava';
 import webpack from 'webpack';
-import SWPrecacheWebpackPlugin from '../lib';
+import SWPrecacheWebpackPlugin from '../src';
 import path from 'path';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
@@ -16,7 +16,6 @@ const DEFAULT_OPTIONS = {
   filename: 'service-worker.js',
   importScripts: [],
   staticFileGlobsIgnorePatterns: [],
-  forceDelete: false,
   mergeStaticsConfig: false,
   minify: false,
 };
@@ -297,13 +296,13 @@ test.serial('uses UglifyJS to minify code', async t => {
       compiler2.plugin('after-emit', (compilation) => {
         withMinificationPlugin.configure(compiler2, compilation);
         resolve(withMinificationPlugin.createServiceWorker());
-      })
+      });
       runCompiler(compiler2);
     }
   );
 
   // Uglify should be at least 1/3 the size of non uglifyied
-  const withMinBytes = Buffer.byteLength(withMinificationFileContents)
+  const withMinBytes = Buffer.byteLength(withMinificationFileContents);
   const withoutMinBytes = Buffer.byteLength(withoutMinificationFileContents);
 
   t.true(withMinBytes < withoutMinBytes);
@@ -438,4 +437,22 @@ test.serial('@stripPrefixMulti can be merged', async t => {
   const actual = plugin.workerOptions.stripPrefixMulti;
 
   t.deepEqual(actual, expected);
+});
+
+test.serial('@filepath will add warning', async t => {
+  t.plan(2);
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({
+    filepath: path.resolve(outputPath, 'foo.js'),
+  });
+
+  plugin.apply(compiler);
+
+  t.truthy(plugin.warnings.length === 0);
+
+  await runCompiler(compiler);
+
+  t.truthy(plugin.warnings.length === 1);
+
 });
