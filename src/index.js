@@ -1,16 +1,14 @@
 import path from 'path';
 import url from 'url';
-import del from 'del';
 import swPrecache from 'sw-precache';
 import UglifyJS from 'uglify-js';
-import fs from 'fs';
 
 const FILEPATH_WARNING = 'sw-prechache-webpack-plugin filepath: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
+
 
 const
   DEFAULT_CACHE_ID = 'sw-precache-webpack-plugin',
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
-  DEFAULT_OUTPUT_PATH = '',
   DEFAULT_PUBLIC_PATH = '',
   DEFAULT_IMPORT_SCRIPTS = [],
   DEFAULT_IGNORE_PATTERNS = [];
@@ -83,13 +81,17 @@ class SWPrecacheWebpackPlugin {
   }
 
   apply(compiler) {
+    // sw-precache needs physical files to reference so we MUST wait until after assets are emitted before generating the service-worker.
     compiler.plugin('after-emit', (compilation, callback) => {
-      this.configure(compiler, compilation, callback);
+      this.configure(compiler, compilation);  // configure the serviceworker options
 
       const done = () => callback();
       const error = (err) => callback(err);
 
-      this.writeServiceWorker(compiler).then(done, error);
+      // generate service worker then write to file system
+      this.createServiceWorker()
+        .then(serviceWorker => this.writeServiceWorker(serviceWorker, compiler, callback))
+        .then(done, error);
     });
   }
 
@@ -102,10 +104,13 @@ class SWPrecacheWebpackPlugin {
         mergeStaticsConfig,
       } = this.options;
 
-      // get the output path specified in webpack config
-    const outputPath = compiler.options.output.path || DEFAULT_OUTPUT_PATH;
+    // get the output path used by webpack
+    const {outputPath} = compiler;
 
-      // get the public path specified in webpack config
+    // outputPath + filename or the user option
+    const {filepath = path.resolve(outputPath, this.options.filename)} = this.options;
+
+    // get the public path specified in webpack config
     const {publicPath = DEFAULT_PUBLIC_PATH} = compiler.options.output;
 
     if (this.options.filepath) {
@@ -113,22 +118,22 @@ class SWPrecacheWebpackPlugin {
       compilation.warnings.push(new Error(FILEPATH_WARNING));
     }
 
-      // get all assets outputted by webpack
+    // get all assets outputted by webpack
     const assetGlobs = Object
-        .keys(compilation.assets)
-        .map(f => path.join(outputPath, f));
+      .keys(compilation.assets)
+      .map(f => path.join(outputPath, f));
 
-      // merge assetGlobs with provided staticFileGlobs and filter using staticFileGlobsIgnorePatterns
+    // merge assetGlobs with provided staticFileGlobs and filter using staticFileGlobsIgnorePatterns
     const staticFileGlobs = assetGlobs.concat(this.options.staticFileGlobs || []).filter(text =>
-        (!staticFileGlobsIgnorePatterns.some((regex) => regex.test(text)))
-      );
+      (!staticFileGlobsIgnorePatterns.some((regex) => regex.test(text)))
+    );
 
     const stripPrefixMulti = {
       ...this.options.stripPrefixMulti,
     };
 
     if (outputPath) {
-        // strip the webpack config's output.path
+      // strip the webpack config's output.path
       stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath;
     }
 
@@ -138,43 +143,25 @@ class SWPrecacheWebpackPlugin {
       stripPrefixMulti,
     };
 
+    // set the actual filepath
+    this.overrides.filepath = filepath;
+
+    // resolve [hash] used in importScripts
     if (importScripts) {
       this.overrides.importScripts = importScripts
-          .map(f => f.replace(/\[hash\]/g, compilation.hash)) // need to override importScripts with stats.hash
-          .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
+        .map(f => f.replace(/\[hash\]/g, compilation.hash)) // need to override importScripts with stats.hash
+        .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
     }
 
     if (mergeStaticsConfig) {
-        // merge generated and user provided options
+      // merge generated and user provided options
       this.overrides = {
         ...this.overrides,
         staticFileGlobs,
         stripPrefixMulti,
       };
     }
-
   }
-
-
-  // createServiceWorker(compiler) {
-  //   const
-  //     fileDir = compiler.options.output.path || DEFAULT_OUTPUT_PATH,
-  //     // default to options.filepath for writing service worker location
-  //     {filepath = path.join(fileDir, this.options.filename)} = this.options;
-  //
-  //   return del(filepath, {force: this.options.forceDelete})
-  //     .then(() => swPrecache.generate(this.workerOptions))
-  //     .then((serviceWorkerFileContents) => {
-  //       if (this.options.minify) {
-  //         const uglifyFiles = {};
-  //         uglifyFiles[this.options.filename] = serviceWorkerFileContents;
-  //         const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
-  //         return minifedCodeObj.code;
-  //       }
-  //       return serviceWorkerFileContents;
-  //     })
-  //     .then((possiblyMinifiedServiceWorkerFileContents) => fs.writeFileSync(filepath, possiblyMinifiedServiceWorkerFileContents));
-  // }
 
   createServiceWorker() {
     return swPrecache.generate(this.workerOptions)
@@ -189,15 +176,12 @@ class SWPrecacheWebpackPlugin {
       });
   }
 
-  writeServiceWorker(compiler) {
-    const
-      fileDir = compiler.options.output.path || DEFAULT_OUTPUT_PATH,
-      // default to options.filepath for writing service worker location
-      {filepath = path.join(fileDir, this.options.filename)} = this.options;
+  writeServiceWorker(serviceWorker, compiler, callback) {
+    const {filepath} = this.workerOptions;
 
-    return del(filepath, {force: this.options.forceDelete})
-      .then(() => this.createServiceWorker())
-      .then(serviceWorker => fs.writeFileSync(filepath, serviceWorker));
+    // use the outputFileSystem api to manually write service workers rather than adding to the compilation assets
+    return compiler.outputFileSystem.mkdirp(path.resolve(filepath, '..'),
+      () => compiler.outputFileSystem.writeFile(filepath, serviceWorker, callback));
   }
 }
 
