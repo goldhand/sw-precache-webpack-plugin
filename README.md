@@ -2,7 +2,6 @@ SW Precache Webpack Plugin
 ==========================
 [![NPM version][npm-img]][npm-url]
 [![NPM downloads][npm-downloads-img]][npm-url]
-[![Dependency Status][daviddm-img]][daviddm-url]
 [![CircleCI][circleci-img]][circleci-url]
 
 __`SWPrecacheWebpackPlugin`__ is a [webpack][webpack] plugin for using [service workers][sw-guide] to cache your external project dependencies. It will generate a service worker file using [sw-precache][sw-precache] and add it to your build directory.
@@ -147,6 +146,8 @@ plugins: [
 Webpack Dev Server Support
 --------------------------
 Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example].
+
+There will likely never be `webpack-dev-server` support. `sw-precache` needs physical files in order to generate the service worker. Webpack-dev-server files are in-memory. It is only possible to provide `sw-precache` with globs to find these files. It will follow the glob pattern and generate a list of file names to cache.
 
 
 Contributing
