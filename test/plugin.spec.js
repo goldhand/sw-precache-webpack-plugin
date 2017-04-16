@@ -4,15 +4,10 @@
 
 import test from 'ava';
 import webpack from 'webpack';
-import SWPrecacheWebpackPlugin from '../lib';
+import SWPrecacheWebpackPlugin from '../src';
 import path from 'path';
 import fs from 'fs';
-import sinon from 'sinon';
-import UglifyJS from 'uglify-js';
 import mkdirp from 'mkdirp';
-import bluebirdPromise from 'bluebird';
-bluebirdPromise.promisifyAll(fs);
-bluebirdPromise.promisifyAll(mkdirp);
 
 const outputPath = path.resolve(__dirname, 'tmp');
 
@@ -21,12 +16,11 @@ const DEFAULT_OPTIONS = {
   filename: 'service-worker.js',
   importScripts: [],
   staticFileGlobsIgnorePatterns: [],
-  forceDelete: false,
   mergeStaticsConfig: false,
   minify: false,
 };
 
-const webpackConfig = () => {
+const webpackConfig = (hash = true) => {
 
   const config = {
     context: __dirname,
@@ -39,6 +33,10 @@ const webpackConfig = () => {
       publicPath: 'http://localhost:3000/assets/',
     },
   };
+
+  if (hash) {
+    config.output.filename = '[name]-[hash].js';
+  }
 
   return config;
 };
@@ -63,8 +61,8 @@ const fsExists = (fp) => new Promise(
 );
 
 
-test.before(async () => {
-  await mkdirp(outputPath);
+test.before(() => {
+  mkdirp.sync(outputPath);
 });
 
 /** SWPrecacheWebpackPlugin constructor paramaters */
@@ -182,17 +180,44 @@ test('can set minify', t => {
 
 /** SWPrecacheWebpackPlugin methods */
 
-test.serial('#writeServiceWorker(compiler, config)', async t => {
+test.skip('#configure()', async t => {
+  // TODO: test configure() method
+  t.pass();
+});
+
+test.serial('#createServiceWorker()', async t => {
+  t.plan(1);
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin();
+
+  compiler.plugin('after-emit', (compilation, callback) => {
+    plugin.configure(compiler, compilation);
+    return callback();
+  });
+
+  await runCompiler(compiler);
+
+  t.truthy(await plugin.createServiceWorker(), 'generate something');
+});
+
+test.serial('#writeServiceWorker(serviceWorker, compiler, callback)', async t => {
   t.plan(2);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
   const compiler = webpack(webpackConfig());
   const plugin = new SWPrecacheWebpackPlugin({filepath});
+  const serviceWorker = 'foo';
+
+  t.falsy(await fsExists(filepath), 'service-worker should not exist yet');
 
   plugin.apply(compiler);
 
-  t.falsy(await fsExists(filepath), 'service-worker should not exist yet');
-  await plugin.writeServiceWorker(compiler, plugin.options);
+  compiler.plugin('after-emit', (compilation, callback) => {
+    plugin.writeServiceWorker(serviceWorker, compiler, callback);
+  });
+  await runCompiler(compiler);
+
   t.truthy(await fsExists(filepath), 'service-worker should exist');
 
 });
@@ -213,7 +238,7 @@ test.cb('#apply(compiler)', t => {
 
 });
 
-test.serial('should keep [hash] in importScripts after writing SW', async t => {
+test.serial('should keep [hash] in importScripts after configuring SW', async t => {
   t.plan(1);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
@@ -221,8 +246,11 @@ test.serial('should keep [hash] in importScripts after writing SW', async t => {
   const plugin = new SWPrecacheWebpackPlugin({filepath, importScripts: ['some_sw-[hash].js']});
 
   plugin.apply(compiler);
+  compiler.plugin('after-emit', (compilation) => {
+    plugin.configure(compiler, compilation);
+  });
+  await runCompiler(compiler);
 
-  await plugin.writeServiceWorker(compiler, plugin.options);
   t.truthy(plugin.options.importScripts[0] === 'some_sw-[hash].js', 'hash should be preserve after writing the sw');
 
 });
@@ -235,39 +263,52 @@ test.serial('should not modify importScripts value when no hash is provided', as
   const plugin = new SWPrecacheWebpackPlugin({filepath, importScripts: ['some_script.js']});
 
   plugin.apply(compiler);
+  compiler.plugin('after-emit', (compilation) => {
+    plugin.configure(compiler, compilation);
+  });
+  await runCompiler(compiler);
 
-  await plugin.writeServiceWorker(compiler, plugin.options);
   t.truthy(plugin.options.importScripts[0] === 'some_script.js', 'importScripts should not be modified');
 
 });
 
 test.serial('uses UglifyJS to minify code', async t => {
-  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
-  const compiler1 = webpack(webpackConfig());
-  const withoutMinificationPlugin = new SWPrecacheWebpackPlugin({filepath, minify: false});
+  t.plan(2);
+
+  const compiler1 = webpack(webpackConfig(0));
+  const withoutMinificationPlugin = new SWPrecacheWebpackPlugin({minify: false});
   withoutMinificationPlugin.apply(compiler1);
-  await withoutMinificationPlugin.writeServiceWorker(compiler1, withoutMinificationPlugin.options);
-  const withoutMinificationFileContents = await fs.readFileAsync(filepath);
-  // spy on uglify
-  const uglifyMock = sinon.mock(UglifyJS);
-  const minifyExpectation = uglifyMock.expects('minify');
-  minifyExpectation.once();
-  minifyExpectation.returns({code: 'minified string', map: null});
-  minifyExpectation.withExactArgs({
-    'service-worker.js': withoutMinificationFileContents.toString(),
-  }, {
-    fromString: true,
-  });
-  const compiler2 = webpack(webpackConfig());
-  const withMinificationPlugin = new SWPrecacheWebpackPlugin({filepath, minify: true});
+  const withoutMinificationFileContents = await new Promise(
+    resolve => {
+      runCompiler(compiler1);
+      compiler1.plugin('after-emit', (compilation) => {
+        withoutMinificationPlugin.configure(compiler1, compilation);
+        resolve(withoutMinificationPlugin.createServiceWorker());
+      });
+    }
+  );
+
+  const compiler2 = webpack(webpackConfig(0));
+  const withMinificationPlugin = new SWPrecacheWebpackPlugin({minify: true});
   withMinificationPlugin.apply(compiler2);
-  await withMinificationPlugin.writeServiceWorker(compiler2, withMinificationPlugin.options);
-  // verify uglify js was called correctly
-  minifyExpectation.verify();
-  uglifyMock.restore();
-  // check if minified code was written correctly
-  const withMinificationFileContents = await fs.readFileAsync(filepath);
-  t.deepEqual(withMinificationFileContents.toString(), 'minified string');
+  const withMinificationFileContents = await new Promise(
+    resolve => {
+      compiler2.plugin('after-emit', (compilation) => {
+        withMinificationPlugin.configure(compiler2, compilation);
+        resolve(withMinificationPlugin.createServiceWorker());
+      });
+      runCompiler(compiler2);
+    }
+  );
+
+  // Uglify should be at least 1/3 the size of non uglifyied
+  const withMinBytes = Buffer.byteLength(withMinificationFileContents);
+  const withoutMinBytes = Buffer.byteLength(withoutMinificationFileContents);
+
+  t.true(withMinBytes < withoutMinBytes);
+
+  // even 2x uglifyied size should be less than regular
+  t.true(withMinBytes * 2 < withoutMinBytes, 'Uglified is more than half the size of non-uglified');
 });
 
 
@@ -284,7 +325,8 @@ test.serial('@staticFileGlobs generates default value', async t => {
 
   await runCompiler(compiler);
 
-  const expected = [path.resolve(outputPath, 'main.js')];
+  const {hash} = await runCompiler(compiler);
+  const expected = [path.resolve(outputPath, `main-${hash}.js`)];
   const actual = plugin.workerOptions.staticFileGlobs;
 
   t.deepEqual(actual, expected);
@@ -321,8 +363,8 @@ test.serial('@staticFileGlobs can be merged', async t => {
 
   plugin.apply(compiler);
 
-  await runCompiler(compiler);
-  const expected = [path.resolve(outputPath, 'main.js'), ...staticFileGlobs];
+  const {hash} = await runCompiler(compiler);
+  const expected = [path.resolve(outputPath, `main-${hash}.js`), ...staticFileGlobs];
   const actual = plugin.workerOptions.staticFileGlobs;
 
   t.deepEqual(actual, expected);
@@ -395,4 +437,22 @@ test.serial('@stripPrefixMulti can be merged', async t => {
   const actual = plugin.workerOptions.stripPrefixMulti;
 
   t.deepEqual(actual, expected);
+});
+
+test.serial('@filepath will add warning', async t => {
+  t.plan(2);
+
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({
+    filepath: path.resolve(outputPath, 'foo.js'),
+  });
+
+  plugin.apply(compiler);
+
+  t.truthy(plugin.warnings.length === 0);
+
+  await runCompiler(compiler);
+
+  t.truthy(plugin.warnings.length === 1);
+
 });
