@@ -1,3 +1,12 @@
+## 0.10.0
+
+* Update unit tests
+* Modularize and refactor
+* Remove forceDelete
+* Add debug option
+* Add final webpack-dev-server notes to readme
+* Remove unaffected sw-precache options from readme
+
 ## 0.9.1
 
 * Lower node engine requirement to 4.0.0
