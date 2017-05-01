@@ -8,6 +8,7 @@ import SWPrecacheWebpackPlugin from '../src';
 import path from 'path';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
+import Template from 'webpack/lib/Template';
 
 const outputPath = path.resolve(__dirname, 'tmp');
 
@@ -238,6 +239,58 @@ test.cb('#apply(compiler)', t => {
 
 });
 
+test.serial('should work with chunkName', async t => {
+  t.plan(2);
+
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const newWebpackConfig = Object.assign({}, webpackConfig());
+  newWebpackConfig.entry.sw = path.resolve(
+    __dirname, 'stubs/service-worker-imported-script.js'
+  );
+  newWebpackConfig.output.filename = '[name].[chunkhash].js';
+  newWebpackConfig.output.chunkFilename = '[id].[name].[chunkhash].js';
+
+  const compiler = webpack(newWebpackConfig);
+  const plugin = new SWPrecacheWebpackPlugin({
+    filepath,
+    importScripts: [
+      'some-script-path.js',
+      {filename: 'some-script-path.[hash].js'},
+      {chunkName: 'sw'},
+    ],
+  });
+
+  plugin.apply(compiler);
+
+  // const {err, hash, chunkHash} = new Promise((resolve, reject) => {
+  const resolved = await new Promise((resolve, reject) => {
+    compiler.plugin('after-emit', (compilation) => {
+      plugin.configure(compiler, compilation);
+
+      const stats = compilation.getStats()
+        .toJson({hash: true, chunks: true, namedChunks: true});
+
+      resolve({
+        hash: compilation.hash,
+        chunkHash: stats.chunks.find(chunk => chunk.names.includes('sw')).hash,
+      });
+    });
+    runCompiler(compiler).catch((err) => reject({err}));
+  });
+
+  const {err, hash, chunkHash} = resolved;
+
+  const actual = plugin.overrides.importScripts;
+  const expected = [
+    `${newWebpackConfig.output.publicPath}some-script-path.js`,
+    `${newWebpackConfig.output.publicPath}some-script-path.${hash}.js`,
+    `${newWebpackConfig.output.publicPath}sw.${chunkHash}.js`,
+  ];
+  //
+  t.ifError(err, `compiler error: ${err}`);
+  t.deepEqual(actual, expected);
+});
+
 test.serial('should keep [hash] in importScripts after configuring SW', async t => {
   t.plan(1);
 
@@ -252,10 +305,9 @@ test.serial('should keep [hash] in importScripts after configuring SW', async t 
   await runCompiler(compiler);
 
   t.truthy(plugin.options.importScripts[0] === 'some_sw-[hash].js', 'hash should be preserve after writing the sw');
-
 });
 
-test.serial('should not modify importScripts value when no hash is provided', async t => {
+test.serial('should not modify importScripts value when no [hash] is provided', async t => {
   t.plan(1);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
