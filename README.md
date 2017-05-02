@@ -1,5 +1,4 @@
 # SW Precache Webpack Plugin
-==========================
 [![NPM version][npm-img]][npm-url]
 [![NPM downloads][npm-downloads-img]][npm-url]
 [![CircleCI][circleci-img]][circleci-url]
