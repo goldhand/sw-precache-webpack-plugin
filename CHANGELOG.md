@@ -1,3 +1,7 @@
+## 0.11.0
+
+* Added [chunkhash]/[hash]/[id]/[name] support for importScripts (#70)
+
 ## 0.10.1
 
 * Update npmignore files
