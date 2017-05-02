@@ -2,17 +2,20 @@ import path from 'path';
 import url from 'url';
 import swPrecache from 'sw-precache';
 import UglifyJS from 'uglify-js';
+import {format} from 'util';
 
 const FILEPATH_WARNING = 'sw-prechache-webpack-plugin [filepath]: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
 const FORCEDELETE_WARNING = 'sw-prechache-webpack-plugin [forceDelete]: You are specifying the option forceDelete. This was removed in v0.10. It should not affect your build but should no longer be required.';
-
 
 const
   DEFAULT_CACHE_ID = 'sw-precache-webpack-plugin',
   DEFAULT_WORKER_FILENAME = 'service-worker.js',
   DEFAULT_PUBLIC_PATH = '',
   DEFAULT_IMPORT_SCRIPTS = [],
-  DEFAULT_IGNORE_PATTERNS = [];
+  DEFAULT_IGNORE_PATTERNS = [],
+  CHUNK_NAME_NOT_FOUND_ERROR = 'Could not locate files for chunkName: "%s"',
+  // eslint-disable-next-line max-len
+  CHUNK_NAME_OVERRIDES_FILENAME_WARNING = 'Don\'t use chunkName & filename together; importScripts[<index>].filename overriden by specified chunkName: %j';
 
 const DEFAULT_OPTIONS = {
   cacheId: DEFAULT_CACHE_ID,
@@ -22,7 +25,6 @@ const DEFAULT_OPTIONS = {
   mergeStaticsConfig: false,
   minify: false,
 };
-
 
 class SWPrecacheWebpackPlugin {
 
@@ -127,11 +129,7 @@ class SWPrecacheWebpackPlugin {
     this.overrides.filepath = filepath;
 
     // resolve [hash] used in importScripts
-    if (importScripts) {
-      this.overrides.importScripts = importScripts
-        .map(f => f.replace(/\[hash\]/g, compilation.hash)) // need to override importScripts with stats.hash
-        .map(f => url.resolve(publicPath, f));  // add publicPath to importScripts
-    }
+    this.configureImportScripts(importScripts, publicPath, compiler, compilation);
 
     if (mergeStaticsConfig) {
       // merge generated and user provided options
@@ -141,6 +139,51 @@ class SWPrecacheWebpackPlugin {
         stripPrefixMulti,
       };
     }
+  }
+
+  configureImportScripts(importScripts, publicPath, compiler, compilation) {
+    if (!importScripts) {
+      return;
+    }
+
+    const {hash, chunks} = compilation.getStats()
+      .toJson({hash: true, chunks: true});
+
+    this.overrides.importScripts = importScripts
+      .reduce((fileList, criteria) => {
+        // legacy support for importScripts items defined as string
+        if (typeof criteria === 'string') {
+          criteria = {filename: criteria};
+        }
+
+        const hasFileName = !!criteria.filename;
+        const hasChunkName = !!criteria.chunkName;
+
+        if (hasFileName && hasChunkName) {
+          this.warnings.push(new Error(
+            format(CHUNK_NAME_OVERRIDES_FILENAME_WARNING, criteria)
+          ));
+        }
+
+        if (hasChunkName) {
+          const chunk = chunks.find(c => c.names.includes(criteria.chunkName));
+
+          if (!chunk) {
+            compilation.errors.push(new Error(
+              format(CHUNK_NAME_NOT_FOUND_ERROR, criteria.chunkName)
+            ));
+            return fileList;
+          }
+
+          const chunkFileName = chunk.files[chunk.names.indexOf(criteria.chunkName)];
+          fileList.push(url.resolve(publicPath, chunkFileName));
+        } else if (hasFileName) {
+          const hashedFilename = criteria.filename.replace(/\[hash\]/g, hash);
+          fileList.push(url.resolve(publicPath, hashedFilename));
+        }
+
+        return fileList;
+      }, []);
   }
 
   createServiceWorker() {
