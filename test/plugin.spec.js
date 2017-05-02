@@ -239,7 +239,7 @@ test.cb('#apply(compiler)', t => {
 
 });
 
-test.serial('should work with chunkName', async t => {
+test.serial('importScripts[<index>] should support entry point & dynamically imported chunk names', async t => {
   t.plan(2);
 
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
@@ -257,6 +257,7 @@ test.serial('should work with chunkName', async t => {
       'some-script-path.js',
       {filename: 'some-script-path.[hash].js'},
       {chunkName: 'sw'},
+      {chunkName: 'service-worker-imported-script-2'}
     ],
   });
 
@@ -270,21 +271,34 @@ test.serial('should work with chunkName', async t => {
       const stats = compilation.getStats()
         .toJson({hash: true, chunks: true, namedChunks: true});
 
+      const dynamicChunk = stats.chunks.find(chunk =>
+        chunk.names.includes('service-worker-imported-script-2'));
       resolve({
         hash: compilation.hash,
-        chunkHash: stats.chunks.find(chunk => chunk.names.includes('sw')).hash,
+        entryPointChunkHash:
+          stats.chunks.find(chunk => chunk.names.includes('sw')).hash,
+        dynamicChunkId: dynamicChunk.id,
+        dynamicChunkHash: dynamicChunk.hash,
       });
     });
     runCompiler(compiler).catch((err) => reject({err}));
   });
 
-  const {err, hash, chunkHash} = resolved;
+
+  const {
+    err,
+    hash,
+    entryPointChunkHash,
+    dynamicChunkId,
+    dynamicChunkHash,
+  } = resolved;
 
   const actual = plugin.overrides.importScripts;
   const expected = [
     `${newWebpackConfig.output.publicPath}some-script-path.js`,
     `${newWebpackConfig.output.publicPath}some-script-path.${hash}.js`,
-    `${newWebpackConfig.output.publicPath}sw.${chunkHash}.js`,
+    `${newWebpackConfig.output.publicPath}sw.${entryPointChunkHash}.js`,
+    `${newWebpackConfig.output.publicPath}${dynamicChunkId}.service-worker-imported-script-2.${dynamicChunkHash}.js`,
   ];
   //
   t.ifError(err, `compiler error: ${err}`);

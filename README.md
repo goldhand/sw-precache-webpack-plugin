@@ -154,12 +154,18 @@ plugins: [
       // - If chunkName is invalid; an error will be reported
       { chunkName: 'sw' },
 
+      // Works for named entry chunks & dynamically imported named chunks:
+      // For ex, if in your code is:
+      // import(/* webpackChunkName: "my-named-chunk" */ './my-async-script.js');
+      { chunkName: 'my-named-chunk' },
+
       // All importSripts entries resolve to a string, therefore
       // the final output of the above input is:
       // [
       //   '/my/public/path/some-known-script-path.js',
       //   '/my/public/path/some-known-script-path.<compilation hash>.js',
-      //   '/my/public/path/some-known-script-path.<chunkhash>.js'
+      //   '/my/public/path/some-known-script-path.<chunkhash>.js',
+      //   '/my/public/path/<id>.my-named-chunk.<chunkhash>.js'
       // ]
     ]
   }),
