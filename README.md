@@ -8,13 +8,11 @@ __`SWPrecacheWebpackPlugin`__ is a [webpack][webpack] plugin for using [service 
 
 
 ## Install
--------
 ```bash
 npm install --save-dev sw-precache-webpack-plugin
 ```
 
 ## Basic Usage
------------
 ```javascript
 var path = require('path');
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
@@ -63,7 +61,6 @@ Then you would just register it in your application:
 [Another example of registering a service worker is provided by GoogleChrome/sw-precache][sw-precache-registration-example]
 
 ## Configuration
--------------
 You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
 
 __plugin options__:
@@ -81,7 +78,9 @@ Pass any option from `sw-precache` into your configuration. Some of these will b
   - When importScripts array item is a `String`:
     - Converts to object format `{ filename: '<publicPath>/my-script.js'}`
   - When importScripts array item is an `Object`:
-    - Looks for
+    - Looks for `chunkName` property.
+    - Looks for `filename` property
+    - **If a `chunkName` is specified, it will override the accompanied value for `filename` 
 * `replacePrefix`: `[String]` - Should only be used in conjunction with `stripPrefix`
 * `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets. If `mergeStaticsConfig=true`: this value will be merged with your bundles' emitted assets, otherwise this value is just passed to `sw-precache` and emitted assets won't be included.
 * `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
@@ -90,7 +89,6 @@ Pass any option from `sw-precache` into your configuration. Some of these will b
 _Note that all configuration options are optional. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler for the `staticFileGlobs` parameter and your webpack config's `{[output.path + '/']: output.publicPath}` as the `stripPrefixMulti` parameter. This behavior is probably what you want, all your webpack assets will be cached by your generated service worker. Just don't pass any arguments when you initialize this plugin, and let this plugin handle generating your `sw-precache` configuration._
 
 ## Examples
---------
 See the [examples documentation][example-project] for more examples.
 
 ### Basic usage example
@@ -122,19 +120,12 @@ plugins: [
 ]
 ```
 
-### `cacheId` usage example
-Uses one option from `sw-precache` (`cacheId`) with one option from `SWPrecacheWebpackPlugin` (`filename`) in a configuration hash:
-```javascript
-plugins: [
-  new SWPrecacheWebpackPlugin({
-    cacheId: 'my-project-name',
-    filename: 'my-project-service-worker.js',
-  }),
-]
-```
-
 ### `importSripts` usage example
-Uses one option from `sw-precache` (`cacheId`) with one option from `SWPrecacheWebpackPlugin` (`filename`) in a configuration hash:
+Accepts an array of `<String|Object>`'s. `String` entries are legacy supported. Use `filename` instead.
+
+If `importScripts` item is object, there are 2 possible properties to set on this object:
+- **filename**: Use this if you are referencing a path that "you just know" exists. You probably don't want to use this for named chunks.
+- **chunkName**: Supports named entry chunks & dynamically imported named chunks.
 ```javascript
 entry: {
   main: __dirname + '/src/index.js',
@@ -176,15 +167,12 @@ plugins: [
 ```
 
 ## Webpack Dev Server Support
---------------------------
 Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example].
 
 There will likely never be `webpack-dev-server` support. `sw-precache` needs physical files in order to generate the service worker. Webpack-dev-server files are in-memory. It is only possible to provide `sw-precache` with globs to find these files. It will follow the glob pattern and generate a list of file names to cache.
 
 
 ## Contributing
-------------
-
 Install node dependencies:
 ```
   $ npm install
@@ -198,7 +186,6 @@ Or:
 Add unit tests for your new feature in `./test/plugin.spec.js`
 
 ## Testing
--------
 Tests are located in `./test`
 
 Run tests:
