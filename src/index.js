@@ -89,6 +89,7 @@ class SWPrecacheWebpackPlugin {
         importScripts,
         staticFileGlobsIgnorePatterns,
         mergeStaticsConfig,
+        stripPrefixMulti = {},
       } = this.options;
 
     // get the output path used by webpack
@@ -110,13 +111,9 @@ class SWPrecacheWebpackPlugin {
       (!staticFileGlobsIgnorePatterns.some((regex) => regex.test(text)))
     );
 
-    const stripPrefixMulti = {
-      ...this.options.stripPrefixMulti,
-    };
-
     if (outputPath) {
-      // strip the webpack config's output.path
-      stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath;
+      // strip the webpack config's output.path (replace for windows users)
+      stripPrefixMulti[`${outputPath}${path.sep}`.replace(/\\/g, '/')] = publicPath;
     }
 
     this.config = {
