@@ -1,3 +1,7 @@
+## 0.9.2
+
+* [Patch] Add windows support
+
 ## 0.9.1
 
 * Lower node engine requirement to 4.0.0
