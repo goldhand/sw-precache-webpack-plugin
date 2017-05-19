@@ -120,7 +120,7 @@ class SWPrecacheWebpackPlugin {
 
       if (outputPath) {
         // strip the webpack config's output.path
-        stripPrefixMulti[`${outputPath}${path.sep}`] = publicPath;
+        stripPrefixMulti[`${outputPath}${path.sep}`.replace(/\\/g, '/')] = publicPath;
       }
 
       this.config = {
