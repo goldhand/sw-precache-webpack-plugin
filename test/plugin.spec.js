@@ -196,15 +196,12 @@ test.serial('#createServiceWorker()', async t => {
     plugin.configure(compiler, compilation);
     return callback();
   });
-
   await runCompiler(compiler);
-
   t.truthy(await plugin.createServiceWorker(), 'generate something');
 });
 
-test.serial('#writeServiceWorker(serviceWorker, compiler, callback)', async t => {
+test.serial('#writeServiceWorker(serviceWorker, compiler)', async t => {
   t.plan(2);
-
   const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
   const compiler = webpack(webpackConfig());
   const plugin = new SWPrecacheWebpackPlugin({filepath});
@@ -215,10 +212,12 @@ test.serial('#writeServiceWorker(serviceWorker, compiler, callback)', async t =>
   plugin.apply(compiler);
 
   compiler.plugin('after-emit', (compilation, callback) => {
-    plugin.writeServiceWorker(serviceWorker, compiler, callback);
+    plugin.writeServiceWorker(serviceWorker, compiler)
+      .then(() => callback())
+      .catch(err => callback(err));
   });
-  await runCompiler(compiler);
 
+  await runCompiler(compiler);
   t.truthy(await fsExists(filepath), 'service-worker should exist');
 
 });
@@ -257,7 +256,7 @@ test.serial('importScripts[<index>] should support entry point & dynamically imp
       'some-script-path.js',
       {filename: 'some-script-path.[hash].js'},
       {chunkName: 'sw'},
-      {chunkName: 'service-worker-imported-script-2'}
+      {chunkName: 'service-worker-imported-script-2'},
     ],
   });
 
@@ -313,9 +312,11 @@ test.serial('should keep [hash] in importScripts after configuring SW', async t 
   const plugin = new SWPrecacheWebpackPlugin({filepath, importScripts: ['some_sw-[hash].js']});
 
   plugin.apply(compiler);
-  compiler.plugin('after-emit', (compilation) => {
+  compiler.plugin('after-emit', (compilation, callback) => {
     plugin.configure(compiler, compilation);
+    callback();
   });
+
   await runCompiler(compiler);
 
   t.truthy(plugin.options.importScripts[0] === 'some_sw-[hash].js', 'hash should be preserve after writing the sw');
@@ -329,8 +330,9 @@ test.serial('should not modify importScripts value when no [hash] is provided', 
   const plugin = new SWPrecacheWebpackPlugin({filepath, importScripts: ['some_script.js']});
 
   plugin.apply(compiler);
-  compiler.plugin('after-emit', (compilation) => {
+  compiler.plugin('after-emit', (compilation, callback) => {
     plugin.configure(compiler, compilation);
+    callback();
   });
   await runCompiler(compiler);
 

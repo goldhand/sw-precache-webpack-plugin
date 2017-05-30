@@ -70,15 +70,13 @@ class SWPrecacheWebpackPlugin {
     // sw-precache needs physical files to reference so we MUST wait until after assets are emitted before generating the service-worker.
     compiler.plugin('after-emit', (compilation, callback) => {
       this.configure(compiler, compilation);  // configure the serviceworker options
-
-      const done = () => callback();
-      const error = (err) => callback(err);
+      this.checkWarnings(compilation);
 
       // generate service worker then write to file system
       this.createServiceWorker()
-        .then(serviceWorker => this.writeServiceWorker(serviceWorker, compiler, callback))
-        .then(this.checkWarnings(compilation))
-        .then(done, error);
+        .then(serviceWorker => this.writeServiceWorker(serviceWorker, compiler))
+        .then(() => callback())
+        .catch(err => callback(err));
     });
   }
 
@@ -196,12 +194,18 @@ class SWPrecacheWebpackPlugin {
       });
   }
 
-  writeServiceWorker(serviceWorker, compiler, callback) {
+  writeServiceWorker(serviceWorker, compiler) {
+    const promisify = func => (...args) => new Promise((resolve, reject) => func(...args, (err, result) => {
+      return err ? reject(err) : resolve(result);
+    }));
+    const mkdirp = promisify(compiler.outputFileSystem.mkdirp);
+    const writeFile = promisify(compiler.outputFileSystem.writeFile);
+
     const {filepath} = this.workerOptions;
 
     // use the outputFileSystem api to manually write service workers rather than adding to the compilation assets
-    return compiler.outputFileSystem.mkdirp(path.resolve(filepath, '..'),
-      () => compiler.outputFileSystem.writeFile(filepath, serviceWorker, callback));
+    return mkdirp(path.resolve(filepath, '..'))
+      .then(() => writeFile(filepath, serviceWorker));
   }
 
   /**
