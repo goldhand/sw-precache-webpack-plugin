@@ -187,8 +187,7 @@ class SWPrecacheWebpackPlugin {
         if (this.options.minify) {
           const uglifyFiles = {};
           uglifyFiles[this.options.filename] = serviceWorkerFileContents;
-          const minifedCodeObj = UglifyJS.minify(uglifyFiles, {fromString: true});
-          return minifedCodeObj.code;
+          return UglifyJS.minify(uglifyFiles).code;
         }
         return serviceWorkerFileContents;
       });

@@ -340,7 +340,7 @@ test.serial('should not modify importScripts value when no [hash] is provided', 
 });
 
 test.serial('uses UglifyJS to minify code', async t => {
-  t.plan(2);
+  t.plan(3);
 
   const compiler1 = webpack(webpackConfig(0));
   const withoutMinificationPlugin = new SWPrecacheWebpackPlugin({minify: false});
@@ -376,6 +376,9 @@ test.serial('uses UglifyJS to minify code', async t => {
 
   // even 2x uglifyied size should be less than regular
   t.true(withMinBytes * 2 < withoutMinBytes, 'Uglified is more than half the size of non-uglified');
+
+  // Something should still be generated, 'undefined' is 9 bytes
+  t.true(withMinBytes > 20);
 });
 
 
