@@ -3,7 +3,6 @@ src/
 examples/
 test/
 .github/
-CHANGELOG.md
 circle.yml
 .babelrc
 .eslintrc

@@ -33,19 +33,24 @@
     "type": "git",
     "url": "git+https://github.com/goldhand/sw-precache-webpack-plugin.git"
   },
-  "author": "Will Farley <a.will.farley@gmail.com>",
+  "author": "Will Farley <a.will.farley@gmail.com> (http://www.willfarley.org/)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/goldhand/sw-precache-webpack-plugin/issues"
   },
   "homepage": "https://github.com/goldhand/sw-precache-webpack-plugin#readme",
+  "directories": {
+    "example": "./examples",
+    "lib": "./src",
+    "test": "./test"
+  },
   "peerDependencies": {
     "webpack": "^1 || ^2 || ^2.1.0-beta || ^2.2.0-beta"
   },
   "dependencies": {
     "del": "^2.2.2",
-    "sw-precache": "^5.0.0",
-    "uglify-js": "^2.8.5"
+    "sw-precache": "^5.1.1",
+    "uglify-js": "^3.0.13"
   },
   "devDependencies": {
     "ava": "^0.18.2",
