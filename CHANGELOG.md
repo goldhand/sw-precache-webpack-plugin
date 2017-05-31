@@ -1,3 +1,11 @@
+## 0.11.1
+
+* :arrow_up: Update dependencies
+* Update example in readme
+* Remove unused Template var from tests
+* Fix errors for MultiCompilers build (#78)
+* Add strip prefix multi windows support (#76)
+
 ## 0.11.0
 
 * Added [chunkhash]/[hash]/[id]/[name] support for importScripts (#70)
