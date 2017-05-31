@@ -1,3 +1,7 @@
+## 0.11.2
+
+* Update uglify-js usage to v3 api
+
 ## 0.11.1
 
 * :arrow_up: Update dependencies
