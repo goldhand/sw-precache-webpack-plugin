@@ -12,13 +12,14 @@ npm install --save-dev sw-precache-webpack-plugin
 ```
 
 ## Basic Usage
+A simple configuration example that will work well in most production environments. Based on the configuration used in [create-react-app].
 ```javascript
 var path = require('path');
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 
+const PUBLIC_PATH = 'https://www.my-project-name.com/';  // webpack needs the trailing slash for output.publicPath
 
 module.exports = {
-  context: __dirname,
 
   entry: {
     main: path.resolve(__dirname, 'src/index'),
@@ -27,22 +28,21 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'src/bundles/'),
     filename: '[name]-[hash].js',
+    publicPath: PUBLIC_PATH,
   },
 
   plugins: [
     new SWPrecacheWebpackPlugin(
       {
         cacheId: 'my-project-name',
-        filename: 'my-service-worker.js',
-        maximumFileSizeToCacheInBytes: 4194304,
+        dontCacheBustUrlsMatching: /\.\w{8}\./,
+        filename: 'service-worker.js',
         minify: true,
-        runtimeCaching: [{
-          handler: 'cacheFirst',
-          urlPattern: /[.]mp3$/,
-        }],
+        navigateFallback: PUBLIC_PATH + 'index.html',
+        staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/],
       }
     ),
-  ]
+  ],
 }
 ```
 
@@ -78,8 +78,8 @@ Pass any option from `sw-precache` into your configuration. Some of these will b
     - Converts to object format `{ filename: '<publicPath>/my-script.js'}`
   - When importScripts array item is an `Object`:
     - Looks for `chunkName` property.
-    - Looks for `filename` property
-    - **If a `chunkName` is specified, it will override the accompanied value for `filename` 
+    - Looks for `filename` property.
+    - **If a `chunkName` is specified, it will override the accompanied value for `filename`.**
 * `replacePrefix`: `[String]` - Should only be used in conjunction with `stripPrefix`
 * `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets. If `mergeStaticsConfig=true`: this value will be merged with your bundles' emitted assets, otherwise this value is just passed to `sw-precache` and emitted assets won't be included.
 * `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
@@ -88,9 +88,10 @@ Pass any option from `sw-precache` into your configuration. Some of these will b
 _Note that all configuration options are optional. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler for the `staticFileGlobs` parameter and your webpack config's `{[output.path + '/']: output.publicPath}` as the `stripPrefixMulti` parameter. This behavior is probably what you want, all your webpack assets will be cached by your generated service worker. Just don't pass any arguments when you initialize this plugin, and let this plugin handle generating your `sw-precache` configuration._
 
 ## Examples
-See the [examples documentation][example-project] for more examples.
+See the [examples documentation][example-project] or the implementation in [create-react-app].
 
-### Basic usage example
+### Simplest Example
+No arguments are required by default, `SWPrecacheWebpackPlugin` will use information provided by webpack to generate a service worker into your build directory that caches all your webpack assets.
 ```javascript
 module.exports = {
   ...
@@ -206,6 +207,7 @@ Run tests:
 [example-project]: /examples/
 [webpack]: http://webpack.github.io/
 [webpack-local-config-example]: https://github.com/goldhand/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
+[create-react-app]: https://github.com/facebookincubator/create-react-app/blob/e91648a9bb55230fa15a7867fd5b730d7e1a5808/packages/react-scripts/config/webpack.config.prod.js#L308
 
 [npm-url]: https://npmjs.org/package/sw-precache-webpack-plugin
 [npm-img]: https://badge.fury.io/js/sw-precache-webpack-plugin.svg
