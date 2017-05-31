@@ -8,7 +8,6 @@ import SWPrecacheWebpackPlugin from '../src';
 import path from 'path';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
-import Template from 'webpack/lib/Template';
 
 const outputPath = path.resolve(__dirname, 'tmp');
 
