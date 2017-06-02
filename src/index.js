@@ -194,17 +194,15 @@ class SWPrecacheWebpackPlugin {
   }
 
   writeServiceWorker(serviceWorker, compiler) {
-    const promisify = func => (...args) => new Promise((resolve, reject) => func(...args, (err, result) => {
-      return err ? reject(err) : resolve(result);
-    }));
-    const mkdirp = promisify(compiler.outputFileSystem.mkdirp);
-    const writeFile = promisify(compiler.outputFileSystem.writeFile);
-
     const {filepath} = this.workerOptions;
+    const {mkdirp, writeFile} = compiler.outputFileSystem;
 
     // use the outputFileSystem api to manually write service workers rather than adding to the compilation assets
-    return mkdirp(path.resolve(filepath, '..'))
-      .then(() => writeFile(filepath, serviceWorker));
+    return new Promise((resolve) => {
+      mkdirp(path.resolve(filepath, '..'), () => {
+        writeFile(filepath, serviceWorker, resolve);
+      });
+    });
   }
 
   /**
