@@ -1,3 +1,7 @@
+## 0.11.3
+
+* avoid promisifying fs ops (fixes #81) (#82)
+
 ## 0.11.2
 
 * Update uglify-js usage to v3 api
