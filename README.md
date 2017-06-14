@@ -120,6 +120,27 @@ plugins: [
 ]
 ```
 
+If you have multiple bundles outputted by webpack, you can create a service worker for each, so clients don't download a lot of unused assets.
+
+```javascript
+...Object.keys(apps())
+  .map(app => new SWPrecacheWebpackPlugin({
+    cacheId: `${app}`,
+    filename: `${app}-service-worker.js`,
+    stripPrefix: 'src/static',
+    staticFileGlobs: [
+      'src/static/js/manifest.*.js',
+      'src/static/js/vendor.*.js',
+      `src/static/js/${app}_vendor.*.js`,
+      `src/static/js/${app}.*.js`,
+      `src/static/css/${app}.*.css`,
+      `src/static/${app}.html`,
+      'src/static/fonts/*',
+    ],
+  }),
+)
+```
+
 ### `importSripts` usage example
 Accepts an array of `<String|Object>`'s. `String` entries are legacy supported. Use `filename` instead.
 
