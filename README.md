@@ -64,7 +64,7 @@ You can pass a hash of configuration options to `SWPrecacheWebpackPlugin`:
 
 __plugin options__:
 * `filename`: `[String]` - Service worker filename, default is `service-worker.js`
-* `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will overried `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
+* `filepath`: `[String]` - Service worker path and name, default is to use `webpack.output.path` + `options.filename`. This will override `filename`. *Warning: Make the service worker available in the same directory it will be needed. This is because the scope of the service worker is defined by the directory the worker exists.*
 * `staticFileGlobsIgnorePatterns`: `[RegExp]` - Define an optional array of regex patterns to filter out of staticFileGlobs (see below)
 * `mergeStaticsConfig`: `[boolean]` - Merge provided staticFileGlobs and stripPrefixMulti with webpack's config, rather than having those take precedence, default is false.
 * `minify`: `[boolean]` - Set to true to minify and uglify the generated service-worker, default is false.
