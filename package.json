@@ -45,7 +45,7 @@
     "test": "./test"
   },
   "peerDependencies": {
-    "webpack": "^1 || ^2 || ^2.1.0-beta || ^2.2.0-beta"
+    "webpack": "^1 || ^2 || ^2.1.0-beta || ^2.2.0-beta || ^3"
   },
   "dependencies": {
     "del": "^2.2.2",
@@ -65,7 +65,7 @@
     "git-release-notes": "1.0.0",
     "mkdirp": "^0.5.1",
     "sinon": "^1.17.7",
-    "webpack": "^2.2.1"
+    "webpack": "^3.0.0"
   },
   "ava": {
     "babel": "inherit",
