@@ -46,7 +46,7 @@ module.exports = {
 }
 ```
 
-This will generate a new service worker at `src/bundles/my-service-worker.js`.
+This will generate a new service worker at `src/bundles/service-worker.js`.
 Then you would just register it in your application:
 
 ```javascript
@@ -120,7 +120,7 @@ plugins: [
 ]
 ```
 
-### `importSripts` usage example
+### `importScripts` usage example
 Accepts an array of `<String|Object>`'s. `String` entries are legacy supported. Use `filename` instead.
 
 If `importScripts` item is object, there are 2 possible properties to set on this object:
