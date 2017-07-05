@@ -35,7 +35,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist/'),
     filename: '[name]-[hash].js',
-    publicPath: 'http://localhost:3000/',
+    publicPath: 'http://127.0.0.1:3000/',
   },
 
   plugins: [
