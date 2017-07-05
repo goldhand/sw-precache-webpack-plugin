@@ -1,7 +1,7 @@
 const
   path = require('path'),
   webpack = require('webpack'),
-  SWPrecacheWebpackPlugin = require('../lib/index'),
+  SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin'),
   HtmlWebpackPlugin = require('html-webpack-plugin');
 
 // sw-precache-webpack-plugin configurations
