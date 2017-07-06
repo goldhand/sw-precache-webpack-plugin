@@ -1,3 +1,7 @@
+## 0.11.4
+
+* Update to webpack 3
+
 ## 0.11.3
 
 * avoid promisifying fs ops (fixes #81) (#82)
