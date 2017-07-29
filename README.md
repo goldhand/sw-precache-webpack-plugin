@@ -138,7 +138,7 @@ output: {
 plugins: [
   new SWPrecacheWebpackPlugin({
     filename: 'my-project-service-worker.js',
-    importSripts: [
+    importScripts: [
       // * legacy supported
       // [chunkhash] is not supported for this usage
       // This is transformed to new object syntax:
