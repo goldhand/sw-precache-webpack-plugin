@@ -173,7 +173,21 @@ plugins: [
 ```
 
 ## Webpack Dev Server Support
-Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example].
+Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example]. 
+
+Or add `setup` section to `devServer` config, e.g.:
+```
+module.exports = {
+    devServer: {
+        setup: function (app) {
+            app.get('/service-worker.js', function (req, res) {
+                res.set({ 'Content-Type': 'application/javascript; charset=utf-8' });
+                res.send(fs.readFileSync('build/service-worker.js'));
+            });
+        }
+    }
+}
+```
 
 There will likely never be `webpack-dev-server` support. `sw-precache` needs physical files in order to generate the service worker. Webpack-dev-server files are in-memory. It is only possible to provide `sw-precache` with globs to find these files. It will follow the glob pattern and generate a list of file names to cache.
 
