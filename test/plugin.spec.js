@@ -8,6 +8,7 @@ import SWPrecacheWebpackPlugin from '../src';
 import path from 'path';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
+import MemoryFileSystem from 'memory-fs';
 
 const outputPath = path.resolve(__dirname, 'tmp');
 
@@ -48,7 +49,13 @@ const webpackConfig = (hash = true) => {
  * @returns {Promise} - resolves webpack stats
 */
 const runCompiler = (compiler) => new Promise(
-  resolve => compiler.run((err, stats) => resolve(stats))
+  (resolve, reject) => compiler.run((err, stats) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(stats);
+    }
+  })
 );
 
 /**
@@ -56,8 +63,8 @@ const runCompiler = (compiler) => new Promise(
  * @param {string} fp - filepath to check exists
  * @returns {Promise} fsExists
  */
-const fsExists = (fp) => new Promise(
-  resolve => fs.access(fp, err => resolve(!err))
+const fsExists = (fp, fileSystem = fs) => new Promise(
+  resolve => fileSystem.stat(fp, err => resolve(!err))
 );
 
 
@@ -234,6 +241,52 @@ test.cb('#apply(compiler)', t => {
     t.is(typeof stats, 'object');
     t.end();
   });
+
+});
+
+test.serial('writeServiceWorker should support memory-fs', async t => {
+  t.plan(2);
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({filepath});
+  const serviceWorker = 'foo';
+
+  const fs = compiler.outputFileSystem = new MemoryFileSystem();
+
+  t.falsy(await fsExists(filepath, fs), 'service-worker should not exist yet');
+
+  plugin.apply(compiler);
+
+  compiler.plugin('after-emit', (compilation, callback) => {
+    plugin.writeServiceWorker(serviceWorker, compiler)
+      .then(() => callback())
+      .catch(err => callback(err));
+  });
+
+  await runCompiler(compiler);
+  t.truthy(await fsExists(filepath, fs), 'service-worker should exist');
+
+});
+
+test.serial('writeServiceWorker shouldn\'t swallow errors', async t => {
+  t.plan(1);
+  const filepath = path.resolve(__dirname, 'tmp/service-worker.js');
+  const compiler = webpack(webpackConfig());
+  const plugin = new SWPrecacheWebpackPlugin({filepath});
+  const serviceWorker = 'foo';
+
+  const fs = compiler.outputFileSystem = new MemoryFileSystem();
+
+  plugin.apply(compiler);
+
+  compiler.plugin('after-emit', (compilation, callback) => {
+    fs.writeFileSync = undefined; // Slightly hackish way to force writeFile to fail
+    plugin.writeServiceWorker(serviceWorker, compiler)
+      .then(() => callback)
+      .catch(err => callback(err));
+  });
+
+  await t.throws(runCompiler(compiler));
 
 });
 

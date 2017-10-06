@@ -63,6 +63,7 @@
     "bluebird": "^3.4.7",
     "eslint": "^3.16.1",
     "git-release-notes": "1.0.0",
+    "memory-fs": "^0.4.1",
     "mkdirp": "^0.5.1",
     "sinon": "^1.17.7",
     "webpack": "^3.0.0"
