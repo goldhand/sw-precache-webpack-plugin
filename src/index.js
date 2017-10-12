@@ -1,7 +1,7 @@
 import path from 'path';
 import url from 'url';
 import swPrecache from 'sw-precache';
-import UglifyJS from 'uglify-js';
+import UglifyJS from 'uglify-es';
 import {format} from 'util';
 
 const FILEPATH_WARNING = 'sw-prechache-webpack-plugin [filepath]: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
