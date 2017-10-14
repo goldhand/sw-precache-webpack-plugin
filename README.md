@@ -52,7 +52,7 @@ Then you would just register it in your application:
 ```javascript
 (function() {
   if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/my-service-worker.js');
+    navigator.serviceWorker.register('/service-worker.js');
   }
 })();
 ```
