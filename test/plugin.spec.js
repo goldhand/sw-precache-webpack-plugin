@@ -392,7 +392,7 @@ test.serial('should not modify importScripts value when no [hash] is provided', 
 
 });
 
-test.serial('uses UglifyJS to minify code', async t => {
+test.serial('uses UglifyJS2 to minify code', async t => {
   t.plan(3);
 
   const compiler1 = webpack(webpackConfig(0));
