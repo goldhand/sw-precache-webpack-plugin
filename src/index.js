@@ -1,7 +1,7 @@
 import path from 'path';
 import url from 'url';
 import swPrecache from 'sw-precache';
-import UglifyJS from 'uglify-js';
+import UglifyJS from 'uglify-es';
 import {format} from 'util';
 
 const FILEPATH_WARNING = 'sw-prechache-webpack-plugin [filepath]: You are using a custom path for your service worker, this may prevent the service worker from working correctly if it is not available in the same path as your application.';
@@ -195,12 +195,22 @@ class SWPrecacheWebpackPlugin {
 
   writeServiceWorker(serviceWorker, compiler) {
     const {filepath} = this.workerOptions;
-    const {mkdirp, writeFile} = compiler.outputFileSystem;
+    const {outputFileSystem} = compiler;
 
     // use the outputFileSystem api to manually write service workers rather than adding to the compilation assets
-    return new Promise((resolve) => {
-      mkdirp(path.resolve(filepath, '..'), () => {
-        writeFile(filepath, serviceWorker, resolve);
+    return new Promise((resolve, reject) => {
+      outputFileSystem.mkdirp(path.resolve(filepath, '..'), (mkdirErr) => {
+        if (mkdirErr) {
+          reject(mkdirErr);
+          return;
+        }
+        outputFileSystem.writeFile(filepath, serviceWorker, writeError => {
+          if (writeError) {
+            reject(writeError);
+          } else {
+            resolve();
+          }
+        });
       });
     });
   }
