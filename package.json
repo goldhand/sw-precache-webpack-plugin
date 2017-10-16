@@ -4,7 +4,7 @@
   "description": "Webpack plugin for using service workers",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "make build",
+    "prepare": "make build",
     "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md",
     "test:unit": "make unit_test",
     "test:integration": "make integration_test",
