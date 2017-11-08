@@ -273,7 +273,7 @@ Run tests:
 [sw-precache-options]: https://github.com/GoogleChrome/sw-precache#options-parameter "SW-Precache Options"
 [sw-precache-registration-example]: https://github.com/GoogleChrome/sw-precache/blob/5699e5d049235ef0f668e8e2aa3bf2646ba3872f/demo/app/js/service-worker-registration.js
 [example-project]: /examples/
-[webpack]: http://webpack.github.io/
+[webpack]: http://webpack.js.org/
 [webpack-local-config-example]: https://github.com/goldhand/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
 [create-react-app]: https://github.com/facebookincubator/create-react-app/blob/e91648a9bb55230fa15a7867fd5b730d7e1a5808/packages/react-scripts/config/webpack.config.prod.js#L308
 
