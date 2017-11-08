@@ -83,7 +83,7 @@ Pass any option from `sw-precache` into your configuration. Some of these will b
 * `replacePrefix`: `[String]` - Should only be used in conjunction with `stripPrefix`
 * `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets. If `mergeStaticsConfig=true`: this value will be merged with your bundles' emitted assets, otherwise this value is just passed to `sw-precache` and emitted assets won't be included.
 * `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
-* `stripPrefixMulti`: `[Object<String,String>]` - Omit this to use your webpack config's `output.path + '/': output.publicPath`. If `mergeStaticsConfig=true`, this value will be merged with your webpack's `output.path: publicPath` for stripping prefixes. Otherwise this property will be passed directly to `sw-precache` and Webpack's output path won't be replaced.
+* `stripPrefixMulti`: `[Object<String,String>]` - Omit this to use your webpack config's `output.path + '/': output.publicPath`. If `mergeStaticsConfig=true`, this value will be merged with your webpack's `output.path: publicPath` for stripping prefixes. Otherwise this property will be passed directly to `sw-precache` and webpack's output path won't be replaced.
 
 _Note that all configuration options are optional. `SWPrecacheWebpackPlugin` will by default use all your assets emitted by webpack's compiler for the `staticFileGlobs` parameter and your webpack config's `{[output.path + '/']: output.publicPath}` as the `stripPrefixMulti` parameter. This behavior is probably what you want, all your webpack assets will be cached by your generated service worker. Just don't pass any arguments when you initialize this plugin, and let this plugin handle generating your `sw-precache` configuration._
 
@@ -103,7 +103,7 @@ module.exports = {
 ```
 
 ### Advanced Example
-Here's a more elaborate example with `mergeStaticsConfig: true` and `staticFileGlobsIgnorePatterns`. `mergeStaticsConfig: true` allows you to add some additional static file globs to the emitted ServiceWorker file alongside Webpack's emitted assets. `staticFileGlobsIgnorePatterns` can be used to avoid including sourcemap file references in the generated ServiceWorker.
+Here's a more elaborate example with `mergeStaticsConfig: true` and `staticFileGlobsIgnorePatterns`. `mergeStaticsConfig: true` allows you to add some additional static file globs to the emitted ServiceWorker file alongside webpack's emitted assets. `staticFileGlobsIgnorePatterns` can be used to avoid including sourcemap file references in the generated ServiceWorker.
 ```javascript
 plugins: [
   new SWPrecacheWebpackPlugin({
@@ -227,7 +227,7 @@ plugins: [
 ```
 
 ## Webpack Dev Server Support
-Currently `SWPrecacheWebpackPlugin` will not work with `Webpack Dev Server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example]. 
+Currently `SWPrecacheWebpackPlugin` will not work with `webpack-dev-server`. If you wish to test the service worker locally, you can use simple a node server [see example project][example-project] or `python SimpleHTTPServer` from your build directory. I would suggest pointing your node server to a different port than your usual local development port and keeping the precache service worker out of your [local configuration (example)][webpack-local-config-example]. 
 
 Or add `setup` section to `devServer` config, e.g.:
 ```
@@ -243,7 +243,7 @@ module.exports = {
 }
 ```
 
-There will likely never be `webpack-dev-server` support. `sw-precache` needs physical files in order to generate the service worker. Webpack-dev-server files are in-memory. It is only possible to provide `sw-precache` with globs to find these files. It will follow the glob pattern and generate a list of file names to cache.
+There will likely never be `webpack-dev-server` support. `sw-precache` needs physical files in order to generate the service worker. `webpack-dev-server` files are in-memory. It is only possible to provide `sw-precache` with globs to find these files. It will follow the glob pattern and generate a list of file names to cache.
 
 
 ## Contributing
@@ -274,7 +274,7 @@ Run tests:
 [sw-precache-registration-example]: https://github.com/GoogleChrome/sw-precache/blob/5699e5d049235ef0f668e8e2aa3bf2646ba3872f/demo/app/js/service-worker-registration.js
 [example-project]: /examples/
 [webpack]: http://webpack.github.io/
-[webpack-local-config-example]: https://github.com/goldhand/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "Webpack local config example"
+[webpack-local-config-example]: https://github.com/goldhand/cookiecutter-webpack/blob/986151474b60dc19166eba18156a1f9dbceecb98/%7B%7Bcookiecutter.repo_name%7D%7D/webpack.local.config.js "webpack local config example"
 [create-react-app]: https://github.com/facebookincubator/create-react-app/blob/e91648a9bb55230fa15a7867fd5b730d7e1a5808/packages/react-scripts/config/webpack.config.prod.js#L308
 
 [npm-url]: https://npmjs.org/package/sw-precache-webpack-plugin
