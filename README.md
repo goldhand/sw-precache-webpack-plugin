@@ -173,7 +173,7 @@ module.exports = {
 }
 ```
 
-### `importSripts` usage example
+### `importScripts` usage example
 
 Accepts an array of `<String|Object>`'s. `String` entries are legacy supported. Use `filename` instead.
 
