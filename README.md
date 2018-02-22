@@ -173,7 +173,7 @@ module.exports = {
 }
 ```
 
-### `importSripts` usage example
+### `importScripts` usage example
 
 Accepts an array of `<String|Object>`'s. `String` entries are legacy supported. Use `filename` instead.
 
@@ -213,7 +213,7 @@ plugins: [
       // import(/* webpackChunkName: "my-named-chunk" */ './my-async-script.js');
       { chunkName: 'my-named-chunk' },
 
-      // All importSripts entries resolve to a string, therefore
+      // All importScripts entries resolve to a string, therefore
       // the final output of the above input is:
       // [
       //   '/my/public/path/some-known-script-path.js',
