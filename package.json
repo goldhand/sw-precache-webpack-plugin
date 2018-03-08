@@ -34,7 +34,7 @@
     "url": "git+https://github.com/goldhand/sw-precache-webpack-plugin.git"
   },
   "author": "Will Farley <a.will.farley@gmail.com> (http://www.willfarley.org/)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/goldhand/sw-precache-webpack-plugin/issues"
   },
