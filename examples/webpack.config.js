@@ -1,6 +1,5 @@
 const
   path = require('path'),
-  webpack = require('webpack'),
   SWPrecacheWebpackPlugin = require('../lib/index'),
   HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -12,7 +11,7 @@ const SW_PRECACHE_CONFIG = {
   minify: true,
   cacheId: SERVICE_WORKER_CACHEID,
   filename: SERVICE_WORKER_FILENAME,
-  staticFileGlobsIgnorePatterns: SERVICE_WORKER_IGNORE_PATTERNS,
+  // staticFileGlobsIgnorePatterns: SERVICE_WORKER_IGNORE_PATTERNS,
 };
 
 const HTML_WEBPACK_OPTIONS = {
@@ -40,13 +39,6 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin(HTML_WEBPACK_OPTIONS.main),
-    // shared stuff between chuncks
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: Infinity,
-      filename: 'vendor-[hash].js',
-      chunks: ['react', 'redux'],
-    }),
     new SWPrecacheWebpackPlugin(SW_PRECACHE_CONFIG),
   ], // add all common plugins here
 
@@ -55,19 +47,28 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loaders: ['babel-loader'],
+        use: [{
+          loader: 'babel-loader',
+        }],
       },
       {
         test: /\.ejs$/,
-        loader: 'ejs-loader',
-        query: {
-          includePaths: [
-            path.resolve(__dirname, 'src/templates/'),
-          ],
-        },
+        use: [{
+          loader: 'ejs-loader',
+          options: {
+            includePaths: [
+              path.resolve(__dirname, 'src/templates/'),
+            ],
+          },
+        }],
       },
-      {test: /\.(png|jpg|gif)$/, loader: 'url-loader', query: {limit: 8192}},  // inline base64 URLs <=8k
-      {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader'},
+      {test: /\.(png|jpg|gif)$/, use: [{
+        loader: 'url-loader',
+        options: {limit: 8192},
+      }]},  // inline base64 URLs <=8k
+      {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, use: [{
+        loader: 'file-loader',
+      }]},
     ], // add all common loaders here
   },
 
