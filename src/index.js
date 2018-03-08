@@ -68,8 +68,8 @@ class SWPrecacheWebpackPlugin {
 
   apply(compiler) {
     // sw-precache needs physical files to reference so we MUST wait until after assets are emitted before generating the service-worker.
-    const afterEmit = (compilation, callback = () => {}) => {
-      this.configure(compiler, compilation);  // configure the serviceworker options
+    const afterEmit = (compilation, callback) => {
+      this.configure(compiler, compilation); // configure the serviceworker options
       this.checkWarnings(compilation);
 
       // generate service worker then write to file system
@@ -79,7 +79,7 @@ class SWPrecacheWebpackPlugin {
         .catch(err => callback(err));
     };
     if (compiler.hooks) {
-      compiler.hooks.afterEmit.tap('swPrecache', afterEmit);
+      compiler.hooks.afterEmit.tapAsync('swPrecache', afterEmit);
     } else {
       compiler.plugin('after-emit', afterEmit);
     }
@@ -89,11 +89,11 @@ class SWPrecacheWebpackPlugin {
 
     // get the defaults from options
     const {
-        importScripts,
-        staticFileGlobsIgnorePatterns,
-        mergeStaticsConfig,
-        stripPrefixMulti = {},
-      } = this.options;
+      importScripts,
+      staticFileGlobsIgnorePatterns,
+      mergeStaticsConfig,
+      stripPrefixMulti = {},
+    } = this.options;
 
     // get the output path used by webpack
     const {outputPath} = compiler;
