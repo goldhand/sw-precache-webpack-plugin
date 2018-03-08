@@ -1,3 +1,15 @@
+## 0.11.5
+
+* Update circleci to node v6.11.5
+* Add explicit MIT license
+* Update package locks
+* add support for webpack 4 (#138)
+* Replacing prepublish script with prepare. (#112)
+* Fixed service worker file name (#111)
+* use uglify-es,
+* Don&#39;t lose implicit instance of `outputFileSystem`; Don&#39;t swallow fs (#110)
+* modify &#34;importSripts&#34; to &#34;importScripts&#34; (#98)
+
 ## 0.11.4
 
 * Update to webpack 3
