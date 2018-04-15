@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --compilers js:babel-register src/**/__tests__/**/*test*.js",
-    "webpack": "NODE_ENV=production ./node_modules/.bin/webpack --config=webpack.config.js --progress",
+    "webpack": "NODE_ENV=production ./node_modules/.bin/webpack --config=webpack.config.js --progress --mode=production",
     "build": "npm run webpack",
     "serve": "node server.js",
     "start": "npm run build && npm run serve"
@@ -16,14 +16,14 @@
     "babel-cli": "^6.14.0",
     "babel-core": "^6.14.0",
     "babel-eslint": "^7.1.0",
-    "babel-loader": "^6.2.5",
+    "babel-loader": "^7.1.4",
     "babel-plugin-transform-class-properties": "^6.11.5",
     "babel-preset-es2015-webpack": "^6.4.3",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.14.0",
     "deep-freeze": "0.0.1",
-    "ejs-loader": "^0.3.0",
+    "ejs-loader": "^0.3.1",
     "es6-promise": "^3.3.1",
     "eslint": "^3.6.0",
     "eslint-loader": "^1.5.0",
@@ -31,9 +31,9 @@
     "eslint-plugin-react": "^6.3.0",
     "expect": "^1.20.2",
     "express": "^5.0.0-alpha.2",
-    "file-loader": "^0.9.0",
+    "file-loader": "^1.1.11",
     "force-case-sensitivity-webpack-plugin": "^0.2.1",
-    "html-webpack-plugin": "^2.22.0",
+    "html-webpack-plugin": "^3.0.6",
     "mocha": "^3.0.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
@@ -41,7 +41,8 @@
     "redux": "^3.6.0",
     "redux-immutable-state-invariant": "1.2.3",
     "sw-precache-webpack-plugin": "^0.11.1",
-    "url-loader": "^0.5.7",
-    "webpack": "^2.2.1"
+    "url-loader": "^1.0.1",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.10"
   }
 }
