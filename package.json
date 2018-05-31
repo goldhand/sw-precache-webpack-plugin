@@ -3,6 +3,7 @@
   "version": "0.11.5",
   "description": "Webpack plugin for using service workers",
   "main": "lib/index.js",
+  "types": "index.d.ts",
   "scripts": {
     "prepare": "make build",
     "version": "make changelog && git add -p CHANGELOG.md && git checkout CHANGELOG.md",
