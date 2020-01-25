@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "del": "^3.0.0",
+    "lodash.template": "^4.5.0",
     "sw-precache": "^5.2.1",
     "uglify-es": "^3.3.9"
   },
