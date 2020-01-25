@@ -83,6 +83,7 @@ Pass any option from `sw-precache` into your configuration. Some of these will b
     - Looks for `filename` property.
     - **If a `chunkName` is specified, it will override the accompanied value for `filename`.**
 * `replacePrefix`: `[String]` - Should only be used in conjunction with `stripPrefix`
+* `runtimeCaching`: `[Array<Object>]` - Configures runtime caching for dynamic content such as HTTP requests. Refer to [sw-precache ](https://github.com/GoogleChromeLabs/sw-precache#runtimecaching-arrayobject) to see all available options.
 * `staticFileGlobs`: `[Array<String>]` - Omit this to allow the plugin to cache all your bundles' emitted assets. If `mergeStaticsConfig=true`: this value will be merged with your bundles' emitted assets, otherwise this value is just passed to `sw-precache` and emitted assets won't be included.
 * `stripPrefix`: `[String]` - Same as `stripPrefixMulti[stripPrefix] = ''`
 * `stripPrefixMulti`: `[Object<String,String>]` - Omit this to use your webpack config's `output.path + '/': output.publicPath`. If `mergeStaticsConfig=true`, this value will be merged with your webpack's `output.path: publicPath` for stripping prefixes. Otherwise this property will be passed directly to `sw-precache` and webpack's output path won't be replaced.
