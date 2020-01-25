@@ -5,6 +5,8 @@
 
 __`SWPrecacheWebpackPlugin`__ is a [webpack][webpack] plugin for using [service workers][sw-guide] to cache your external project dependencies. It will generate a service worker file using [sw-precache][sw-precache] and add it to your build directory.
 
+## 🚨 No longer being updated
+*I will try to keep this up-to-date with new webpack releases so feel free to keep using this if you like but I will not be adding any new features. I would recommend using [workbox-webpack-plugins#GenerateSW](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin#generatesw_plugin) which is actively being supported.*
 
 ## Install
 ```bash
