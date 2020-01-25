@@ -66,7 +66,7 @@
     "memory-fs": "^0.4.1",
     "mkdirp": "^0.5.1",
     "sinon": "^4.4.2",
-    "webpack": "^4.0.1"
+    "webpack": "^4.41.5"
   },
   "ava": {
     "babel": "inherit",
