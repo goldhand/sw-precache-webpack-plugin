@@ -1,3 +1,14 @@
+## x.x.x
+
+* Remove yarn.lock because its redundant with package.lock
+* Add sw-precache transitive dependency, lodash.template, with patched version
+* Remove eslint from example dependencies
+* Update yarn lockfile to address vulnerability warnings
+* Update dependencies to fix vulnerability warnings
+* Add &#34;no longer being supported&#34; notice.
+* Fix typos in readme (#126)
+* Write &#39;webpack&#39; in lower-case letters (#118)
+
 ## 0.11.5
 
 * Update circleci to node v6.11.5
